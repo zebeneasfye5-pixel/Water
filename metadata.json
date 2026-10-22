@@ -1,0 +1,6 @@
+{
+  "name": "የውሃና ፍሳሽ አገልግሎት ዲጂታል ፖርታል",
+  "description": "የውሃ ስርጭት መርሃ-ግብር ማሳወቂያ፣ የፍጆታና የመዋጮ ክፍያዎች፣ የብልሽት አቤቱታ በፎቶና ቪዲዮ፣ እና የማህበረሰብ የአሰራር እውቀት መጋሪያ የተሟላ የውሃ ተቋም ዲጂታል ፖርታል",
+  "requestFramePermissions": ["camera", "microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
