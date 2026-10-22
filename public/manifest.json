@@ -1,0 +1,33 @@
+{
+  "id": "/",
+  "name": "የውሃና ፍሳሽ አገልግሎት ዲጂታል ፖርታል",
+  "short_name": "ማይ-ውሃ",
+  "description": "የውሃ ስርጭት መርሃ-ግብር ማሳወቂያ፣ የፍጆታና የመዋጮ ክፍያዎች፣ እና የብልሽት አቤቱታ በፎቶና ቪዲዮ",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#082f49",
+  "theme_color": "#0e7490",
+  "categories": ["utilities", "government", "productivity"],
+  "icons": [
+    {
+      "src": "/pwa-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

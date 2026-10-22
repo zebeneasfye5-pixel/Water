@@ -9,6 +9,14 @@
     <meta property="og:description" content="የውሃ ስርጭት መርሃ-ግብር ማሳወቂያ፣ የፍጆታና የመዋጮ ክፍያዎች፣ የብልሽት አቤቱታ በፎቶና ቪዲዮ፣ እና የማህበረሰብ የአሰራር እውቀት መጋሪያ የተሟላ የውሃ ተቋም ዲጂታል ፖርታል" />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#0e7490" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="ማይ-ውሃ" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -16,6 +24,17 @@
   <body class="bg-slate-50 text-slate-900 font-sans antialiased selection:bg-cyan-500 selection:text-white">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').then((reg) => {
+            console.log('AquaFlow ServiceWorker registered:', reg.scope);
+          }).catch((err) => {
+            console.warn('ServiceWorker registration error:', err);
+          });
+        });
+      }
+    </script>
   </body>
 </html>
 

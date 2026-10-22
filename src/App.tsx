@@ -20,7 +20,10 @@ import {
   X,
   FileCheck2,
   Layers,
-  ChevronRight
+  ChevronRight,
+  Smartphone,
+  Download,
+  UserPlus
 } from 'lucide-react';
 import {
   Language,
@@ -47,6 +50,8 @@ import { IncidentReportingView } from './components/IncidentReportingView';
 import { InnovationKnowledgeView } from './components/InnovationKnowledgeView';
 import { TankerRequestModal } from './components/TankerRequestModal';
 import { AdminDispatchView } from './components/AdminDispatchView';
+import { PWAInstallModal } from './components/PWAInstallModal';
+import { RegistrationPortalView } from './components/RegistrationPortalView';
 
 // Hero image generated asset
 import heroImage from './assets/images/water_utility_hero_1792630539286.jpg';
@@ -69,8 +74,9 @@ export default function App() {
     return (saved as Language) || 'am';
   });
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
-  const [activeNav, setActiveNav] = useState<'schedule' | 'payments' | 'incident' | 'knowledge' | 'staff'>('schedule');
+  const [activeNav, setActiveNav] = useState<'schedule' | 'payments' | 'incident' | 'knowledge' | 'staff' | 'register'>('schedule');
   const [isTankerModalOpen, setIsTankerModalOpen] = useState(false);
+  const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
 
   // Sync language to local storage
   useEffect(() => {
@@ -141,6 +147,34 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('aquaflow_tankers', JSON.stringify(tankerRequests));
   }, [tankerRequests]);
+
+  // Initial sync from live backend database
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      try {
+        const [billsRes, incRes, notRes] = await Promise.all([
+          fetch('/api/bills').catch(() => null),
+          fetch('/api/incidents').catch(() => null),
+          fetch('/api/broadcast/notices').catch(() => null)
+        ]);
+        if (billsRes && billsRes.ok) {
+          const bData = await billsRes.json();
+          if (bData.bills && bData.bills.length > 0) setBills(bData.bills);
+        }
+        if (incRes && incRes.ok) {
+          const iData = await incRes.json();
+          if (iData.incidents && iData.incidents.length > 0) setIncidents(iData.incidents);
+        }
+        if (notRes && notRes.ok) {
+          const nData = await notRes.json();
+          if (nData.notices && nData.notices.length > 0) setNotices(nData.notices);
+        }
+      } catch (err) {
+        // Safe offline / local fallback
+      }
+    };
+    fetchInitialData();
+  }, []);
 
   const t = translations[lang];
 
@@ -385,6 +419,15 @@ export default function App() {
               <span>{t.navReportIncident}</span>
             </button>
             <button
+              onClick={() => setActiveNav('register')}
+              className={`hover:text-slate-900 transition-colors whitespace-nowrap shrink-0 py-1 flex items-center gap-1.5 ${
+                activeNav === 'register' ? 'text-cyan-800 border-b-2 border-cyan-700 font-bold' : ''
+              }`}
+            >
+              <UserPlus className="w-3.5 h-3.5 text-cyan-600" />
+              <span>{lang === 'am' ? 'ይመዝገቡ' : lang === 'om' ? 'Galmaa\'aa' : lang === 'ti' ? 'ተመዝገቡ' : 'Register'}</span>
+            </button>
+            <button
               onClick={() => setActiveNav('knowledge')}
               className={`hover:text-slate-900 transition-colors whitespace-nowrap shrink-0 py-1 ${
                 activeNav === 'knowledge' ? 'text-cyan-800 border-b-2 border-cyan-700' : ''
@@ -459,6 +502,16 @@ export default function App() {
               )}
             </div>
 
+            {/* Mobile App Download & Install Button */}
+            <button
+              onClick={() => setIsInstallModalOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-cyan-700 to-cyan-800 hover:from-cyan-800 hover:to-cyan-900 text-white rounded-lg text-xs font-bold transition shadow-xs whitespace-nowrap shrink-0"
+              title="አፕሊኬሽኑን በስልክዎ ላይ ጫን / Install Mobile App"
+            >
+              <Smartphone className="w-3.5 h-3.5 text-cyan-200" />
+              <span>{lang === 'am' ? 'አፕ በስልክ ጫን' : lang === 'om' ? 'App Moobaayila' : lang === 'ti' ? 'ኣፕ ጽዓን' : 'Install App'}</span>
+            </button>
+
             {/* Tanker Request Button */}
             <button
               onClick={() => setIsTankerModalOpen(true)}
@@ -471,7 +524,7 @@ export default function App() {
             {/* Primary Action Button (Report Issue in Photo/Video) */}
             <button
               onClick={() => setActiveNav('incident')}
-              className="px-4 py-2 text-xs font-bold text-white bg-cyan-700 rounded-lg hover:bg-cyan-800 shadow-sm transition-colors whitespace-nowrap shrink-0 flex items-center gap-1.5"
+              className="px-4 py-2 text-xs font-bold text-white bg-slate-900 rounded-lg hover:bg-slate-800 shadow-sm transition-colors whitespace-nowrap shrink-0 flex items-center gap-1.5"
             >
               <AlertCircle className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">{t.reportIssueBtn}</span>
@@ -507,6 +560,15 @@ export default function App() {
             {t.navReportIncident}
           </button>
           <button
+            onClick={() => setActiveNav('register')}
+            className={`px-3 py-1.5 rounded-md font-medium whitespace-nowrap shrink-0 flex items-center gap-1 ${
+              activeNav === 'register' ? 'bg-cyan-700 text-white font-bold' : 'text-cyan-800 bg-cyan-100/60'
+            }`}
+          >
+            <UserPlus className="w-3.5 h-3.5" />
+            <span>{lang === 'am' ? 'ይመዝገቡ' : 'Register'}</span>
+          </button>
+          <button
             onClick={() => setActiveNav('knowledge')}
             className={`px-3 py-1.5 rounded-md font-medium whitespace-nowrap shrink-0 ${
               activeNav === 'knowledge' ? 'bg-cyan-700 text-white' : 'text-slate-600'
@@ -527,6 +589,13 @@ export default function App() {
             className="px-3 py-1.5 rounded-md font-medium text-cyan-800 bg-cyan-100/60 whitespace-nowrap shrink-0"
           >
             {t.navTanker}
+          </button>
+          <button
+            onClick={() => setIsInstallModalOpen(true)}
+            className="px-3 py-1.5 rounded-md font-bold text-white bg-gradient-to-r from-cyan-700 to-cyan-800 whitespace-nowrap shrink-0 flex items-center gap-1 shadow-xs"
+          >
+            <Smartphone className="w-3.5 h-3.5 text-cyan-200" />
+            <span>{lang === 'am' ? 'አፕ ጫን' : 'Install App'}</span>
           </button>
         </div>
       </header>
@@ -570,10 +639,24 @@ export default function App() {
                   <span>{t.reportIssueBtn}</span>
                 </button>
                 <button
+                  onClick={() => setActiveNav('register')}
+                  className="px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-2"
+                >
+                  <UserPlus className="w-4 h-4 text-emerald-200" />
+                  <span>{lang === 'am' ? 'አዲስ ቆጣሪ መዝግብ' : lang === 'om' ? 'Koodii Lakkooftuu Galmeessi' : lang === 'ti' ? 'ሓዲሽ ቆጻሪ መዝግብ' : 'Register Water Meter'}</span>
+                </button>
+                <button
                   onClick={() => setActiveNav('payments')}
                   className="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition"
                 >
                   {t.payBillBtn}
+                </button>
+                <button
+                  onClick={() => setIsInstallModalOpen(true)}
+                  className="px-5 py-3 bg-cyan-50 border border-cyan-200 text-cyan-800 hover:bg-cyan-100 rounded-xl text-xs font-bold transition flex items-center gap-2"
+                >
+                  <Smartphone className="w-4 h-4 text-cyan-700" />
+                  <span>{lang === 'am' ? 'አፑን በስልክ ጫን (PWA)' : lang === 'om' ? 'App Moobaayila Fe\'i' : lang === 'ti' ? 'ኣፕ ኣብ ሞባይል ጽዓን' : 'Install App'}</span>
                 </button>
               </div>
 
@@ -672,6 +755,38 @@ export default function App() {
           />
         )}
 
+        {activeNav === 'register' && (
+          <RegistrationPortalView
+            lang={lang}
+            onCustomerRegistered={(newCust) => {
+              setBills(prev => [
+                {
+                  id: `bill-${Date.now()}`,
+                  customerId: newCust.id,
+                  customerName: newCust.fullName,
+                  customerPhone: newCust.phone,
+                  meterNumber: newCust.meterId,
+                  subCity: newCust.subCity || newCust.city,
+                  kebele: newCust.kebele,
+                  billingPeriod: 'የመጀመሪያ ምዝገባ 2026',
+                  previousReadingM3: 0,
+                  currentReadingM3: newCust.lastReadingM3,
+                  consumptionM3: 0,
+                  amountBirr: 0,
+                  sanitationFeeBirr: 0,
+                  meterRentBirr: 0,
+                  totalBirr: 0,
+                  dueDate: new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0],
+                  status: 'paid'
+                },
+                ...prev
+              ]);
+            }}
+            onNavigateToSchedule={() => setActiveNav('schedule')}
+            onNavigateToBilling={() => setActiveNav('payments')}
+          />
+        )}
+
         {activeNav === 'staff' && (
           <AdminDispatchView
             incidents={incidents}
@@ -683,6 +798,7 @@ export default function App() {
             onUpdateIncidentStatus={handleUpdateIncidentStatus}
             onUpdateScheduleStatus={handleUpdateScheduleStatus}
             onPublishNotice={handlePublishNotice}
+            onBillsUpdated={(updated) => setBills(updated)}
           />
         )}
       </main>
@@ -693,6 +809,13 @@ export default function App() {
         onClose={() => setIsTankerModalOpen(false)}
         lang={lang}
         onRequestSubmitted={handleTankerSubmitted}
+      />
+
+      {/* 5B. MOBILE PWA INSTALL MODAL */}
+      <PWAInstallModal
+        isOpen={isInstallModalOpen}
+        onClose={() => setIsInstallModalOpen(false)}
+        lang={lang}
       />
 
       {/* 6. COMPREHENSIVE FOOTER */}

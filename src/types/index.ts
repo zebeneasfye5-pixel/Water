@@ -145,3 +145,58 @@ export interface EmergencyNotice {
   publishedAt: string;
   active: boolean;
 }
+
+export interface CustomerRecord {
+  id: string;
+  meterId: string;
+  fullName: string;
+  phone: string;
+  country: string;
+  region: string;
+  city: string;
+  subCity?: string;
+  kebele: string;
+  houseNumber?: string;
+  nationalIdNumber?: string;
+  propertyType?: 'residential' | 'commercial' | 'industrial' | 'agricultural' | 'public_institution';
+  currentBill: number;
+  currency?: string;
+  lastReadingM3: number;
+  meterStatus: 'active' | 'pending_verification' | 'faulty' | 'disconnected';
+  gpsCoordinates?: { latitude: number; longitude: number };
+  registeredAt: string;
+  updatedAt: string;
+}
+
+export interface WaterUtilityOffice {
+  id: string;
+  nameAm: string;
+  nameEn: string;
+  code: string;
+  country: string;
+  region: string;
+  headquartersCity: string;
+  contactPhone: string;
+  emergencyHotline: string;
+  directorName: string;
+  coverageZones: string[];
+  serviceLevel: 'municipal' | 'regional' | 'national' | 'international';
+  totalSubscribers: number;
+  registeredAt: string;
+  isVerified: boolean;
+}
+
+export interface TechnicianProfile {
+  id: string;
+  fullName: string;
+  phone: string;
+  country: string;
+  region: string;
+  city: string;
+  specialization: string;
+  licenseNumber: string;
+  utilityAffiliation?: string;
+  status: 'available' | 'on_duty' | 'off_duty';
+  registeredAt: string;
+}
+

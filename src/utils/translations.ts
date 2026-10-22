@@ -8,6 +8,7 @@ export interface TranslationDictionary {
   navReportIncident: string;
   navKnowledge: string;
   navTanker: string;
+  navRegister?: string;
   navStaffPortal: string;
   switchRoleToStaff: string;
   switchRoleToCitizen: string;
