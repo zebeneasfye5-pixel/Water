@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { IncidentReport, WaterSchedule, BillRecord, ContributionProject, EmergencyNotice, Language } from '../types';
 import { translations } from '../utils/translations';
+import { InteractiveGpsMap } from './InteractiveGpsMap';
 
 interface AdminDispatchViewProps {
   incidents: IncidentReport[];
@@ -1109,6 +1110,23 @@ MTR-55102,ዳዊት ወልደሚካኤል,አራዳ,ቀበሌ 01,0933112233,610,
                   <img src={inspectingIncident.photoUrl} alt="Incident Proof" className="w-full max-h-64 object-cover" />
                 </div>
               )}
+
+              {/* Geotagged Satellite Location */}
+              <div className="space-y-1">
+                <span className="text-xs font-bold text-slate-800 block">
+                  {lang === 'am' ? 'የብልሽቱ ትክክለኛ የሳተላይት መገኛ ካርታ' : 'Satellite Location Map'}:
+                </span>
+                <InteractiveGpsMap
+                  latitude={inspectingIncident.gpsCoordinates?.latitude || 9.0105}
+                  longitude={inspectingIncident.gpsCoordinates?.longitude || 38.7612}
+                  accuracy={inspectingIncident.gpsCoordinates?.accuracy || 20}
+                  label={`${inspectingIncident.ticketNumber} - ${inspectingIncident.subCityAm}`}
+                  isEditable={false}
+                  variant="incident"
+                  height="220px"
+                  lang={lang}
+                />
+              </div>
 
               <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs text-slate-700">
                 <strong>{lang === 'am' ? 'የሪፖርቱ ዝርዝር ማብራሪያ' : 'Description'}:</strong>

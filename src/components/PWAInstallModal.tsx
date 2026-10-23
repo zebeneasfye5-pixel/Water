@@ -87,23 +87,23 @@ export const PWAInstallModal: React.FC<PWAInstallModalProps> = ({ isOpen, onClos
               </div>
             </div>
 
-            {/* Direct 1-Click Install Button (When browser supports native prompt) */}
-            {isInstallable ? (
-              <div className="space-y-2 pt-1">
-                <button
-                  onClick={handleNativeInstall}
-                  className="w-full py-3 bg-cyan-700 hover:bg-cyan-800 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 shadow-sm"
-                >
-                  <Download className="w-4 h-4" />
-                  <span>
-                    {lang === 'am' ? 'አሁን በስልክዎ ላይ ጫን (Install Now)' : 'Install to Home Screen'}
-                  </span>
-                </button>
-                <p className="text-[11px] text-center text-slate-400">
-                  {lang === 'am' ? 'ምንም አይነት የማስታወሻ ቦታ አይወስድም (ቀላል PWA)' : 'Lightweight, safe, and takes zero storage space'}
-                </p>
-              </div>
-            ) : null}
+            {/* Direct 1-Click Install Button */}
+            <div className="space-y-2 pt-1">
+              <button
+                onClick={handleNativeInstall}
+                className="w-full py-3 bg-gradient-to-r from-cyan-600 to-cyan-700 hover:from-cyan-700 hover:to-cyan-800 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 shadow-md active:scale-98"
+              >
+                <Download className="w-4 h-4 text-cyan-200" />
+                <span>
+                  {isInstallable
+                    ? (lang === 'am' ? 'አሁን በ1 ጠቅታ ጫን (Install Now)' : 'Install to Home Screen')
+                    : (lang === 'am' ? 'አፕሊኬሽኑን በስልክዎ ላይ ጫን (Install App)' : 'Install on Your Device')}
+                </span>
+              </button>
+              <p className="text-[11px] text-center text-slate-500">
+                {lang === 'am' ? 'ምንም አይነት የማስታወሻ ቦታ አይወስድም (ቀላል፣ ደህንነቱ የተጠበቀ PWA)' : 'Takes 0 storage space • Fast, safe & works offline'}
+              </p>
+            </div>
 
             {/* Android Chrome Instructions */}
             <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 space-y-2">

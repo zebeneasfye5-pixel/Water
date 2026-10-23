@@ -22,6 +22,7 @@ import { IncidentReport, Language } from '../types';
 import { translations } from '../utils/translations';
 import { MediaCaptureModal } from './MediaCaptureModal';
 import { REGIONS_DIRECTORY } from '../data/regionsData';
+import { InteractiveGpsMap } from './InteractiveGpsMap';
 
 interface IncidentReportingViewProps {
   incidents: IncidentReport[];
@@ -456,31 +457,39 @@ export const IncidentReportingView: React.FC<IncidentReportingViewProps> = ({
                   </div>
                 </div>
 
-                {/* GPS Coordinates locked badge */}
-                {gpsCoords && (
-                  <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between text-xs animate-in fade-in">
-                    <div className="flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                      <div>
-                        <span className="font-bold text-emerald-900 block">
-                          {lang === 'am' ? 'ትክክለኛ የሳተላይት መገኛ (GPS Locked):' : 'Satellite Coordinates Locked:'}
-                        </span>
-                        <span className="font-mono text-emerald-800 text-[11px]">
-                          {gpsCoords.latitude}° N, {gpsCoords.longitude}° E {gpsCoords.accuracy ? `(±${gpsCoords.accuracy}m)` : ''}
-                        </span>
-                      </div>
-                    </div>
-                    <a
-                      href={`https://maps.google.com/?q=${gpsCoords.latitude},${gpsCoords.longitude}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[11px] text-emerald-700 hover:underline font-semibold flex items-center gap-1"
-                    >
-                      <ExternalLink className="w-3 h-3" />
-                      <span>{lang === 'am' ? 'በካርታ እይ' : 'Open Map'}</span>
-                    </a>
+                {/* GPS Coordinates & Interactive Satellite Map */}
+                <div className="space-y-2 pt-2">
+                  <div className="flex items-center justify-between text-xs px-1">
+                    <span className="font-semibold text-slate-800 flex items-center gap-1.5">
+                      <MapPin className="w-4 h-4 text-red-600" />
+                      <span>{lang === 'am' ? 'የብልሽቱ ትክክለኛ የሳተላይት ካርታ መገኛ (ምስል)' : 'Exact Satellite & Street Location'}</span>
+                    </span>
+                    <span className="text-[11px] font-mono text-slate-500">
+                      {gpsCoords ? `${gpsCoords.latitude.toFixed(5)}°N, ${gpsCoords.longitude.toFixed(5)}°E` : '9.0105°N, 38.7612°E'}
+                    </span>
                   </div>
-                )}
+
+                  <InteractiveGpsMap
+                    latitude={gpsCoords?.latitude || 9.0105}
+                    longitude={gpsCoords?.longitude || 38.7612}
+                    accuracy={gpsCoords?.accuracy || 15}
+                    label={category ? `${category.replace('_', ' ')}` : (lang === 'am' ? 'የብልሽት ቦታ' : 'Leak Location')}
+                    isEditable={true}
+                    variant="incident"
+                    height="280px"
+                    lang={lang}
+                    onLocationChange={(coords) => {
+                      setGpsCoords(coords);
+                      if (!specificLocation || specificLocation.includes('ጂፒኤስ፡') || specificLocation.includes('GPS:')) {
+                        setSpecificLocation(
+                          lang === 'am'
+                            ? `ጂፒኤስ፡ ${coords.latitude}°N, ${coords.longitude}°E (±${coords.accuracy || 10}m)`
+                            : `GPS: ${coords.latitude}°N, ${coords.longitude}°E (±${coords.accuracy || 10}m)`
+                        );
+                      }
+                    }}
+                  />
+                </div>
               </div>
 
               {/* Reporter contact */}
@@ -778,6 +787,24 @@ export const IncidentReportingView: React.FC<IncidentReportingViewProps> = ({
               <div className="text-xs text-slate-700 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
                 <span className="font-bold block text-slate-900 mb-1">{t.descriptionLabel}:</span>
                 <p className="leading-relaxed">{searchedIncident.description}</p>
+              </div>
+
+              {/* Map of Incident Location */}
+              <div className="space-y-1.5">
+                <span className="text-xs font-bold text-slate-900 block flex items-center gap-1.5">
+                  <MapPin className="w-4 h-4 text-red-600" />
+                  <span>{lang === 'am' ? 'የብልሽቱ ትክክለኛ የሳተላይት መገኛ ካርታ' : 'Geographic Satellite Location'}</span>
+                </span>
+                <InteractiveGpsMap
+                  latitude={searchedIncident.gpsCoordinates?.latitude || 9.0105}
+                  longitude={searchedIncident.gpsCoordinates?.longitude || 38.7612}
+                  accuracy={searchedIncident.gpsCoordinates?.accuracy || 20}
+                  label={`${searchedIncident.ticketNumber} - ${searchedIncident.subCityAm}`}
+                  isEditable={false}
+                  variant="incident"
+                  height="240px"
+                  lang={lang}
+                />
               </div>
 
               {/* Media attached proof */}

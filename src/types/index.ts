@@ -81,6 +81,7 @@ export interface IncidentReport {
   audioVoiceUrl?: string;
   status: 'submitted' | 'assigned' | 'in_progress' | 'resolved';
   createdAt: string;
+  gpsCoordinates?: { latitude: number; longitude: number; accuracy?: number };
   assignedTechnician?: string;
   technicianPhone?: string;
   resolutionNotes?: string;
@@ -154,6 +155,7 @@ export interface CustomerRecord {
   country: string;
   region: string;
   city: string;
+  woreda?: string;
   subCity?: string;
   kebele: string;
   houseNumber?: string;
@@ -163,7 +165,7 @@ export interface CustomerRecord {
   currency?: string;
   lastReadingM3: number;
   meterStatus: 'active' | 'pending_verification' | 'faulty' | 'disconnected';
-  gpsCoordinates?: { latitude: number; longitude: number };
+  gpsCoordinates?: { latitude: number; longitude: number; accuracy?: number };
   registeredAt: string;
   updatedAt: string;
 }

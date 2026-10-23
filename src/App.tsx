@@ -51,6 +51,7 @@ import { InnovationKnowledgeView } from './components/InnovationKnowledgeView';
 import { TankerRequestModal } from './components/TankerRequestModal';
 import { AdminDispatchView } from './components/AdminDispatchView';
 import { PWAInstallModal } from './components/PWAInstallModal';
+import { MobileInstallFloatingBanner } from './components/MobileInstallFloatingBanner';
 import { RegistrationPortalView } from './components/RegistrationPortalView';
 
 // Hero image generated asset
@@ -816,6 +817,12 @@ export default function App() {
         isOpen={isInstallModalOpen}
         onClose={() => setIsInstallModalOpen(false)}
         lang={lang}
+      />
+
+      {/* Floating Quick Mobile Install Banner */}
+      <MobileInstallFloatingBanner
+        lang={lang}
+        onOpenModal={() => setIsInstallModalOpen(true)}
       />
 
       {/* 6. COMPREHENSIVE FOOTER */}

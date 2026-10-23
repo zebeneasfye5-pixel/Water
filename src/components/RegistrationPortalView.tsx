@@ -26,6 +26,7 @@ import {
 import { Language, CustomerRecord, WaterUtilityOffice, TechnicianProfile } from '../types';
 import { translations } from '../utils/translations';
 import { REGIONS_DIRECTORY, RegionInfo } from '../data/regionsData';
+import { InteractiveGpsMap } from './InteractiveGpsMap';
 
 interface RegistrationPortalViewProps {
   lang: Language;
@@ -48,6 +49,7 @@ export const RegistrationPortalView: React.FC<RegistrationPortalViewProps> = ({
   const [custCountry, setCustCountry] = useState<'Ethiopia' | 'International'>('Ethiopia');
   const [custRegionId, setCustRegionId] = useState<string>('addis_ababa');
   const [custCity, setCustCity] = useState<string>('Bole');
+  const [custWoreda, setCustWoreda] = useState<string>('ወረዳ 03');
   const [custSubCity, setCustSubCity] = useState<string>('');
   const [custKebele, setCustKebele] = useState<string>('ቀበሌ 01');
   const [custHouseNo, setCustHouseNo] = useState<string>('');
@@ -175,6 +177,7 @@ export const RegistrationPortalView: React.FC<RegistrationPortalViewProps> = ({
         country: custCountry,
         region: selectedRegion.nameEn,
         city: custCity,
+        woreda: custWoreda,
         subCity: custSubCity || custCity,
         kebele: custKebele || 'ቀበሌ 01',
         houseNumber: custHouseNo,
@@ -432,6 +435,12 @@ export const RegistrationPortalView: React.FC<RegistrationPortalViewProps> = ({
                     </span>
                   </div>
                   <div>
+                    <span className="text-[11px] text-slate-400 block">{isEthiopic ? 'ወረዳና ቀበሌ' : 'Woreda & Kebele'}:</span>
+                    <span className="font-semibold text-cyan-200">
+                      {registeredSuccessResult.customer.woreda ? `${registeredSuccessResult.customer.woreda}፣ ` : ''}{registeredSuccessResult.customer.kebele}
+                    </span>
+                  </div>
+                  <div>
                     <span className="text-[11px] text-slate-400 block">{isEthiopic ? 'ስልክ ቁጥር' : 'Phone'}:</span>
                     <span className="font-mono text-slate-200">{registeredSuccessResult.customer.phone}</span>
                   </div>
@@ -551,7 +560,7 @@ export const RegistrationPortalView: React.FC<RegistrationPortalViewProps> = ({
 
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">
-                      {isEthiopic ? 'ከተማ / ክፍለ ከተማ / ወረዳ' : 'City / Sub-City'} *
+                      {isEthiopic ? 'ከተማ / ክፍለ ከተማ' : 'City / Sub-City'} *
                     </label>
                     <select
                       value={custCity}
@@ -567,7 +576,21 @@ export const RegistrationPortalView: React.FC<RegistrationPortalViewProps> = ({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      {isEthiopic ? 'ወረዳ (Woreda / District)' : 'Woreda / District'} *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={custWoreda}
+                      onChange={(e) => setCustWoreda(e.target.value)}
+                      placeholder={isEthiopic ? 'ምሳሌ፡ ወረዳ 03 ወይም ወረዳ 12' : 'e.g. Woreda 03'}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs"
+                    />
+                  </div>
+
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">
                       {isEthiopic ? 'ቀበሌ / ሰፈር' : 'Kebele / Neighborhood'} *
@@ -702,17 +725,17 @@ export const RegistrationPortalView: React.FC<RegistrationPortalViewProps> = ({
                   </div>
                 </div>
 
-                {/* GPS Capture Button */}
-                <div className="pt-2">
+                {/* GPS Capture & Interactive Visual Map */}
+                <div className="pt-2 space-y-3">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-white rounded-xl border border-slate-200">
                     <div>
                       <span className="text-xs font-bold text-slate-800 block">
-                        {isEthiopic ? 'የቆጣሪው ትክክለኛ የሳተላይት መገኛ (GPS Point)' : 'Geotag Meter Location'}
+                        {isEthiopic ? 'የቆጣሪው ትክክለኛ የሳተላይት መገኛ (GPS & Satellite Geotag)' : 'Geotag Meter Location on Satellite Map'}
                       </span>
                       <span className="text-[11px] text-slate-500">
                         {custGpsCoords
-                          ? `${custGpsCoords.latitude}° N, ${custGpsCoords.longitude}° E (±${custGpsCoords.accuracy || 10}m)`
-                          : (isEthiopic ? 'የቧንቧውን ትክክለኛ ቦታ ለመመዝገብ ከስልክዎ GPS ይውሰዱ' : 'Click to tag precise meter coordinates')}
+                          ? `${custGpsCoords.latitude}° N, ${custGpsCoords.longitude}° E (ትክክለኛነት፡ ±${custGpsCoords.accuracy || 10}m)`
+                          : (isEthiopic ? 'ከስልክዎ GPS ይውሰዱ ወይም በካርታው ላይ ጠቅ በማድረግ የቆጣሪውን ትክክለኛ ቦታ ያመልክቱ' : 'Click to tag precise meter coordinates')}
                       </span>
                     </div>
 
@@ -720,11 +743,38 @@ export const RegistrationPortalView: React.FC<RegistrationPortalViewProps> = ({
                       type="button"
                       onClick={handleCaptureGps}
                       disabled={isGettingGps}
-                      className="px-3 py-1.5 bg-cyan-50 border border-cyan-200 text-cyan-800 rounded-lg text-xs font-bold hover:bg-cyan-100 transition flex items-center gap-1.5 shrink-0"
+                      className="px-3.5 py-2 bg-cyan-700 hover:bg-cyan-800 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shrink-0 shadow-xs"
                     >
                       {isGettingGps ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Crosshair className="w-3.5 h-3.5" />}
                       <span>{isEthiopic ? 'የአሁኑን GPS ጠቁም' : 'Tag GPS Point'}</span>
                     </button>
+                  </div>
+
+                  {/* Visual Map Rendering with Satellite & Street Imagery */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between text-[11px] text-slate-600 px-1">
+                      <span className="font-semibold flex items-center gap-1">
+                        <MapPin className="w-3.5 h-3.5 text-cyan-600" />
+                        {isEthiopic ? 'የሳተላይት ካርታ እይታ (በካርታው ላይ በመጫን ወይም ፒኑን በማንቀሳቀስ የቆጣሪውን ቦታ ያስተካክሉ)' : 'Interactive Satellite View (Click or drag pin to exact water meter)'}
+                      </span>
+                      <span className="text-slate-400 font-mono text-[10px]">
+                        {(custGpsCoords?.latitude || 9.0105).toFixed(4)}°N, {(custGpsCoords?.longitude || 38.7612).toFixed(4)}°E
+                      </span>
+                    </div>
+
+                    <InteractiveGpsMap
+                      latitude={custGpsCoords?.latitude || 9.0105}
+                      longitude={custGpsCoords?.longitude || 38.7612}
+                      accuracy={custGpsCoords?.accuracy || 15}
+                      label={custFullName ? `${custFullName} - ቆጣሪ` : 'አዲስ የውሃ ቆጣሪ'}
+                      isEditable={true}
+                      variant="meter"
+                      height="300px"
+                      lang={lang}
+                      onLocationChange={(coords) => {
+                        setCustGpsCoords(coords);
+                      }}
+                    />
                   </div>
                 </div>
               </div>
