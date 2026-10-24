@@ -23,7 +23,8 @@ import {
   ChevronRight,
   Smartphone,
   Download,
-  UserPlus
+  UserPlus,
+  LayoutDashboard
 } from 'lucide-react';
 import {
   Language,
@@ -53,6 +54,9 @@ import { AdminDispatchView } from './components/AdminDispatchView';
 import { PWAInstallModal } from './components/PWAInstallModal';
 import { MobileInstallFloatingBanner } from './components/MobileInstallFloatingBanner';
 import { RegistrationPortalView } from './components/RegistrationPortalView';
+import { CitizenDashboardView } from './components/CitizenDashboardView';
+import { InstitutionalContractAgreementView } from './components/InstitutionalContractAgreementView';
+import { CustomerRecord } from './types';
 
 // Hero image generated asset
 import heroImage from './assets/images/water_utility_hero_1792630539286.jpg';
@@ -75,7 +79,7 @@ export default function App() {
     return (saved as Language) || 'am';
   });
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
-  const [activeNav, setActiveNav] = useState<'schedule' | 'payments' | 'incident' | 'knowledge' | 'staff' | 'register'>('schedule');
+  const [activeNav, setActiveNav] = useState<'schedule' | 'citizen-dashboard' | 'payments' | 'incident' | 'knowledge' | 'staff' | 'register' | 'contract'>('schedule');
   const [isTankerModalOpen, setIsTankerModalOpen] = useState(false);
   const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
 
@@ -119,6 +123,113 @@ export default function App() {
     const saved = localStorage.getItem('aquaflow_tankers');
     return saved ? JSON.parse(saved) : [];
   });
+
+  const [customers, setCustomers] = useState<CustomerRecord[]>(() => {
+    const saved = localStorage.getItem('aquaflow_customers');
+    if (saved) return JSON.parse(saved);
+    return [
+      {
+        id: 'cust-1',
+        fullName: 'አበበ ተፈራ ገብረመድህን',
+        phone: '0911245678',
+        meterId: 'MTR-09412',
+        country: 'Ethiopia',
+        region: 'አዲስ አበባ',
+        city: 'ቦሌ',
+        subCity: 'ቦሌ',
+        kebele: 'ቀበሌ 04',
+        houseNumber: 'ቤት 412',
+        nationalIdNumber: 'ET-NAT-98412',
+        propertyType: 'residential',
+        currentBill: 395.50,
+        lastReadingM3: 434,
+        meterStatus: 'active',
+        registeredAt: '2026-01-15',
+        updatedAt: '2026-10-23'
+      },
+      {
+        id: 'cust-2',
+        fullName: 'ወ/ሮ ትእግስት አስፋው',
+        phone: '0922887766',
+        meterId: 'MTR-10294',
+        country: 'Ethiopia',
+        region: 'አዲስ አበባ',
+        city: 'የካ',
+        subCity: 'የካ',
+        kebele: 'ቀበሌ 08',
+        houseNumber: 'ቤት 104',
+        nationalIdNumber: 'ET-NAT-44120',
+        propertyType: 'residential',
+        currentBill: 313.00,
+        lastReadingM3: 198,
+        meterStatus: 'active',
+        registeredAt: '2026-02-10',
+        updatedAt: '2026-10-23'
+      },
+      {
+        id: 'cust-3',
+        fullName: 'ዶ/ር ሰለሞን ሀይሉ',
+        phone: '0933551122',
+        meterId: 'MTR-04821',
+        country: 'Ethiopia',
+        region: 'አዲስ አበባ',
+        city: 'ቂርቆስ',
+        subCity: 'ቂርቆስ',
+        kebele: 'ቀበሌ 15',
+        houseNumber: 'ቤት 99',
+        nationalIdNumber: 'ET-NAT-77124',
+        propertyType: 'commercial',
+        currentBill: 0,
+        lastReadingM3: 675,
+        meterStatus: 'active',
+        registeredAt: '2026-03-01',
+        updatedAt: '2026-10-23'
+      },
+      {
+        id: 'cust-4',
+        fullName: 'ጫላ ጉቱ በዳኔ',
+        phone: '0911776655',
+        meterId: 'MTR-ETH-OROMIA-0129',
+        country: 'Ethiopia',
+        region: 'ኦሮሚያ',
+        city: 'አዳማ',
+        subCity: 'ቦሌ ዞን',
+        kebele: 'ቀበሌ 03',
+        houseNumber: 'ቤት 22',
+        nationalIdNumber: 'ET-NAT-33102',
+        propertyType: 'residential',
+        currentBill: 275.00,
+        lastReadingM3: 215,
+        meterStatus: 'active',
+        registeredAt: '2026-04-12',
+        updatedAt: '2026-10-23'
+      },
+      {
+        id: 'cust-5',
+        fullName: 'ሙሉቀን ደሴ ካሳ',
+        phone: '0918334455',
+        meterId: 'MTR-AMH-BAHIR-4410',
+        country: 'Ethiopia',
+        region: 'አማራ',
+        city: 'ባህር ዳር',
+        subCity: 'ጣና ዞን',
+        kebele: 'ቀበሌ 04',
+        houseNumber: 'ቤት 55',
+        nationalIdNumber: 'ET-NAT-55194',
+        propertyType: 'residential',
+        currentBill: 310.00,
+        lastReadingM3: 165,
+        meterStatus: 'active',
+        registeredAt: '2026-05-18',
+        updatedAt: '2026-10-23'
+      }
+    ];
+  });
+
+  // Sync customers to local storage
+  useEffect(() => {
+    localStorage.setItem('aquaflow_customers', JSON.stringify(customers));
+  }, [customers]);
 
   // Sync to local storage
   useEffect(() => {
@@ -186,7 +297,8 @@ export default function App() {
     );
   };
 
-  const handlePayBill = (billId: string, method: any, txRef: string) => {
+  const handlePayBill = (billId: string, method: any, txRef?: string) => {
+    const reference = txRef || `TX-${method?.toUpperCase() || 'PAY'}-${Math.floor(10000000 + Math.random() * 90000000)}`;
     setBills(prev =>
       prev.map(b =>
         b.id === billId
@@ -195,7 +307,7 @@ export default function App() {
               status: 'paid',
               paidAt: new Date().toISOString(),
               paymentMethod: method,
-              transactionRef: txRef,
+              transactionRef: reference,
               receiptNumber: `REC-${new Date().getFullYear()}-${Math.floor(10000 + Math.random() * 90000)}`
             }
           : b
@@ -433,7 +545,7 @@ export default function App() {
           </button>
 
           {/* Zone 2: Concise Nav Links */}
-          <nav className="hidden lg:flex items-center gap-6 text-xs font-semibold text-slate-600">
+          <nav className="hidden lg:flex items-center gap-5 text-xs font-semibold text-slate-600">
             <button
               onClick={() => setActiveNav('schedule')}
               className={`hover:text-slate-900 transition-colors whitespace-nowrap shrink-0 py-1 ${
@@ -441,6 +553,15 @@ export default function App() {
               }`}
             >
               {t.navSchedule}
+            </button>
+            <button
+              onClick={() => setActiveNav('citizen-dashboard')}
+              className={`hover:text-slate-900 transition-colors whitespace-nowrap shrink-0 py-1 flex items-center gap-1.5 font-bold ${
+                activeNav === 'citizen-dashboard' ? 'text-cyan-800 border-b-2 border-cyan-700' : 'text-slate-700'
+              }`}
+            >
+              <LayoutDashboard className="w-3.5 h-3.5 text-cyan-600" />
+              <span>{lang === 'am' ? 'የተጠቃሚ ዳሽቦርድ' : 'My Dashboard'}</span>
             </button>
             <button
               onClick={() => setActiveNav('payments')}
@@ -478,12 +599,21 @@ export default function App() {
             </button>
             <button
               onClick={() => setActiveNav('staff')}
-              className={`hover:text-slate-900 transition-colors whitespace-nowrap shrink-0 py-1 flex items-center gap-1 ${
-                activeNav === 'staff' ? 'text-slate-900 font-bold border-b-2 border-slate-900' : 'text-slate-500'
+              className={`hover:text-slate-900 transition-colors whitespace-nowrap shrink-0 py-1 flex items-center gap-1.5 ${
+                activeNav === 'staff' ? 'text-slate-900 font-bold border-b-2 border-slate-900' : 'text-slate-600'
               }`}
             >
               <Shield className="w-3.5 h-3.5" />
               <span>{t.navStaffPortal}</span>
+            </button>
+            <button
+              onClick={() => setActiveNav('contract')}
+              className={`hover:text-slate-900 transition-colors whitespace-nowrap shrink-0 py-1 flex items-center gap-1.5 text-purple-800 ${
+                activeNav === 'contract' ? 'font-bold border-b-2 border-purple-700' : ''
+              }`}
+            >
+              <FileCheck2 className="w-3.5 h-3.5 text-purple-600" />
+              <span>{lang === 'am' ? 'የአስተዳደር ውል' : 'SLA Contract'}</span>
             </button>
           </nav>
 
@@ -585,6 +715,14 @@ export default function App() {
             {t.navSchedule}
           </button>
           <button
+            onClick={() => setActiveNav('citizen-dashboard')}
+            className={`px-3 py-1.5 rounded-md font-bold whitespace-nowrap shrink-0 ${
+              activeNav === 'citizen-dashboard' ? 'bg-cyan-700 text-white' : 'text-slate-700 bg-white border border-slate-200'
+            }`}
+          >
+            {lang === 'am' ? 'የተጠቃሚ ዳሽቦርድ' : 'My Dashboard'}
+          </button>
+          <button
             onClick={() => setActiveNav('payments')}
             className={`px-3 py-1.5 rounded-md font-medium whitespace-nowrap shrink-0 ${
               activeNav === 'payments' ? 'bg-cyan-700 text-white' : 'text-slate-600'
@@ -608,6 +746,22 @@ export default function App() {
           >
             <UserPlus className="w-3.5 h-3.5" />
             <span>{lang === 'am' ? 'ይመዝገቡ' : 'Register'}</span>
+          </button>
+          <button
+            onClick={() => setActiveNav('staff')}
+            className={`px-3 py-1.5 rounded-md font-medium whitespace-nowrap shrink-0 ${
+              activeNav === 'staff' ? 'bg-slate-900 text-white' : 'text-slate-600'
+            }`}
+          >
+            {t.navStaffPortal}
+          </button>
+          <button
+            onClick={() => setActiveNav('contract')}
+            className={`px-3 py-1.5 rounded-md font-bold whitespace-nowrap shrink-0 ${
+              activeNav === 'contract' ? 'bg-purple-800 text-white' : 'text-purple-800 bg-purple-50'
+            }`}
+          >
+            {lang === 'am' ? 'ውል (SLA)' : 'Contract'}
           </button>
           <button
             onClick={() => setActiveNav('knowledge')}
@@ -802,6 +956,7 @@ export default function App() {
           <RegistrationPortalView
             lang={lang}
             onCustomerRegistered={(newCust) => {
+              setCustomers(prev => [newCust, ...prev]);
               setBills(prev => [
                 {
                   id: `bill-${Date.now()}`,
@@ -830,6 +985,23 @@ export default function App() {
           />
         )}
 
+        {activeNav === 'citizen-dashboard' && (
+          <CitizenDashboardView
+            bills={bills}
+            incidents={incidents}
+            schedules={schedules}
+            lang={lang}
+            onPayBill={handlePayBill}
+            onNavigateToReport={() => setActiveNav('incident')}
+            onNavigateToSchedule={() => setActiveNav('schedule')}
+            onOpenTankerModal={() => setIsTankerModalOpen(true)}
+          />
+        )}
+
+        {activeNav === 'contract' && (
+          <InstitutionalContractAgreementView lang={lang} />
+        )}
+
         {activeNav === 'staff' && (
           <AdminDispatchView
             incidents={incidents}
@@ -837,11 +1009,13 @@ export default function App() {
             bills={bills}
             contributions={contributions}
             notices={notices}
+            customers={customers}
             lang={lang}
             onUpdateIncidentStatus={handleUpdateIncidentStatus}
             onUpdateScheduleStatus={handleUpdateScheduleStatus}
             onPublishNotice={handlePublishNotice}
             onBillsUpdated={(updated) => setBills(updated)}
+            onCustomersImported={(newCust) => setCustomers(prev => [...newCust, ...prev])}
           />
         )}
       </main>

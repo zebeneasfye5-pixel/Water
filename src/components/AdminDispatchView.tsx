@@ -23,11 +23,20 @@ import {
   Smartphone,
   ExternalLink,
   DollarSign,
-  MapPin
+  MapPin,
+  LayoutDashboard,
+  FileCheck2,
+  Activity,
+  TrendingUp,
+  BarChart3,
+  Layers,
+  ArrowRight
 } from 'lucide-react';
-import { IncidentReport, WaterSchedule, BillRecord, ContributionProject, EmergencyNotice, Language } from '../types';
+import { IncidentReport, WaterSchedule, BillRecord, ContributionProject, EmergencyNotice, Language, CustomerRecord } from '../types';
 import { translations } from '../utils/translations';
 import { InteractiveGpsMap } from './InteractiveGpsMap';
+import { ExcelManagementCenter } from './ExcelManagementCenter';
+import { InstitutionalContractAgreementView } from './InstitutionalContractAgreementView';
 
 interface AdminDispatchViewProps {
   incidents: IncidentReport[];
@@ -35,11 +44,13 @@ interface AdminDispatchViewProps {
   bills: BillRecord[];
   contributions: ContributionProject[];
   notices: EmergencyNotice[];
+  customers?: CustomerRecord[];
   lang: Language;
   onUpdateIncidentStatus: (incidentId: string, status: IncidentReport['status'], technicianName?: string, technicianPhone?: string, resolutionNotes?: string) => void;
   onUpdateScheduleStatus: (scheduleId: string, status: WaterSchedule['status'], pressureBar: number) => void;
   onPublishNotice: (notice: Omit<EmergencyNotice, 'id' | 'publishedAt'>) => void;
   onBillsUpdated?: (updatedBills: BillRecord[]) => void;
+  onCustomersImported?: (newCustomers: CustomerRecord[]) => void;
 }
 
 export const AdminDispatchView: React.FC<AdminDispatchViewProps> = ({
@@ -48,15 +59,17 @@ export const AdminDispatchView: React.FC<AdminDispatchViewProps> = ({
   bills,
   contributions,
   notices,
+  customers = [],
   lang,
   onUpdateIncidentStatus,
   onUpdateScheduleStatus,
   onPublishNotice,
-  onBillsUpdated
+  onBillsUpdated,
+  onCustomersImported
 }) => {
   const t = translations[lang];
   const isEthiopic = lang === 'am' || lang === 'ti';
-  const [activeAdminTab, setActiveAdminTab] = useState<'incidents' | 'schedules' | 'broadcast' | 'bulk-upload' | 'webhooks'>('incidents');
+  const [activeAdminTab, setActiveAdminTab] = useState<'dashboard' | 'incidents' | 'schedules' | 'excel-center' | 'contract' | 'broadcast' | 'bulk-upload' | 'webhooks'>('dashboard');
 
   // Media Inspection Modal
   const [inspectingIncident, setInspectingIncident] = useState<IncidentReport | null>(null);
@@ -352,10 +365,46 @@ MTR-55102,ዳዊት ወልደሚካኤል,አራዳ,ቀበሌ 01,0933112233,610,
       </div>
 
       {/* Admin Tab Navigation */}
-      <div className="flex flex-wrap items-center gap-2 p-1.5 bg-slate-100 rounded-xl w-fit">
+      <div className="flex flex-wrap items-center gap-2 p-1.5 bg-slate-100 rounded-2xl w-fit">
+        <button
+          onClick={() => setActiveAdminTab('dashboard')}
+          className={`px-3.5 py-2 text-xs font-bold rounded-xl transition whitespace-nowrap shrink-0 flex items-center gap-2 ${
+            activeAdminTab === 'dashboard'
+              ? 'bg-white text-slate-900 shadow-sm'
+              : 'text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          <LayoutDashboard className="w-4 h-4 text-cyan-600" />
+          <span>{lang === 'am' ? 'የተቋሙ ስራ አስፈፃሚ ዳሽቦርድ' : 'Executive Dashboard'}</span>
+        </button>
+
+        <button
+          onClick={() => setActiveAdminTab('excel-center')}
+          className={`px-3.5 py-2 text-xs font-bold rounded-xl transition whitespace-nowrap shrink-0 flex items-center gap-2 ${
+            activeAdminTab === 'excel-center'
+              ? 'bg-white text-slate-900 shadow-sm'
+              : 'text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
+          <span>{lang === 'am' ? 'የኤክሴል ማዕከል (Excel Hub)' : 'Excel Center'}</span>
+        </button>
+
+        <button
+          onClick={() => setActiveAdminTab('contract')}
+          className={`px-3.5 py-2 text-xs font-bold rounded-xl transition whitespace-nowrap shrink-0 flex items-center gap-2 ${
+            activeAdminTab === 'contract'
+              ? 'bg-white text-slate-900 shadow-sm'
+              : 'text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          <FileCheck2 className="w-4 h-4 text-purple-600" />
+          <span>{lang === 'am' ? 'የአስተዳደር ውል (SLA)' : 'Handover & SLA'}</span>
+        </button>
+
         <button
           onClick={() => setActiveAdminTab('incidents')}
-          className={`px-3.5 py-2 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 flex items-center gap-2 ${
+          className={`px-3.5 py-2 text-xs font-bold rounded-xl transition whitespace-nowrap shrink-0 flex items-center gap-2 ${
             activeAdminTab === 'incidents'
               ? 'bg-white text-slate-900 shadow-sm'
               : 'text-slate-600 hover:text-slate-900'
@@ -367,7 +416,7 @@ MTR-55102,ዳዊት ወልደሚካኤል,አራዳ,ቀበሌ 01,0933112233,610,
 
         <button
           onClick={() => setActiveAdminTab('schedules')}
-          className={`px-3.5 py-2 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 flex items-center gap-2 ${
+          className={`px-3.5 py-2 text-xs font-bold rounded-xl transition whitespace-nowrap shrink-0 flex items-center gap-2 ${
             activeAdminTab === 'schedules'
               ? 'bg-white text-slate-900 shadow-sm'
               : 'text-slate-600 hover:text-slate-900'
@@ -379,40 +428,227 @@ MTR-55102,ዳዊት ወልደሚካኤል,አራዳ,ቀበሌ 01,0933112233,610,
 
         <button
           onClick={() => setActiveAdminTab('broadcast')}
-          className={`px-3.5 py-2 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 flex items-center gap-2 ${
+          className={`px-3.5 py-2 text-xs font-bold rounded-xl transition whitespace-nowrap shrink-0 flex items-center gap-2 ${
             activeAdminTab === 'broadcast'
               ? 'bg-white text-slate-900 shadow-sm'
               : 'text-slate-600 hover:text-slate-900'
           }`}
         >
           <Radio className="w-4 h-4 text-amber-600" />
-          {lang === 'am' ? 'አስቸኳይ ኤስኤምኤስ (SMS Gateway)' : 'Emergency SMS Gateway'}
-        </button>
-
-        <button
-          onClick={() => setActiveAdminTab('bulk-upload')}
-          className={`px-3.5 py-2 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 flex items-center gap-2 ${
-            activeAdminTab === 'bulk-upload'
-              ? 'bg-white text-slate-900 shadow-sm'
-              : 'text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
-          {lang === 'am' ? 'በኤክሴል መጫኛ (Excel Bulk)' : 'Excel Bulk Upload'}
+          {lang === 'am' ? 'አስቸኳይ ኤስኤምኤስ' : 'Emergency SMS'}
         </button>
 
         <button
           onClick={() => setActiveAdminTab('webhooks')}
-          className={`px-3.5 py-2 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 flex items-center gap-2 ${
+          className={`px-3.5 py-2 text-xs font-bold rounded-xl transition whitespace-nowrap shrink-0 flex items-center gap-2 ${
             activeAdminTab === 'webhooks'
               ? 'bg-white text-slate-900 shadow-sm'
               : 'text-slate-600 hover:text-slate-900'
           }`}
         >
           <Webhook className="w-4 h-4 text-purple-600" />
-          {lang === 'am' ? 'ቻፓ Webhook & ኦዲት' : 'Chapa Webhook & Audit'}
+          {lang === 'am' ? 'ቻፓ Webhook' : 'Webhooks'}
         </button>
       </div>
+
+      {/* EXECUTIVE INSTITUTION DASHBOARD */}
+      {activeAdminTab === 'dashboard' && (
+        <div className="space-y-6">
+          {/* Executive Overview Hero Card */}
+          <div className="bg-gradient-to-r from-slate-900 via-cyan-950 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+            <div className="relative z-10 space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 text-xs font-bold">
+                    <Activity className="w-3.5 h-3.5" />
+                    <span>{isEthiopic ? 'የተቋሙ የቀጥታ ቁጥጥር ማዕከል (Live Utility Command Center)' : 'Live Utility Command Center'}</span>
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight mt-2">
+                    {isEthiopic ? 'የመጠጥ ውሃና ፍሳሽ አስተዳደር ጠቅላላ የስራ አፈፃፀም ዳሽቦርድ' : 'Municipal Water Authority Executive Performance Dashboard'}
+                  </h2>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setActiveAdminTab('excel-center')}
+                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1.5"
+                  >
+                    <FileSpreadsheet className="w-4 h-4" />
+                    <span>{isEthiopic ? 'የኤክሴል ሪፖርት ማውጫ' : 'Open Excel Center'}</span>
+                  </button>
+                  <button
+                    onClick={() => setActiveAdminTab('contract')}
+                    className="px-4 py-2 bg-white text-slate-900 hover:bg-cyan-50 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1.5"
+                  >
+                    <FileCheck2 className="w-4 h-4 text-purple-700" />
+                    <span>{isEthiopic ? 'የአስተዳደር ውል (SLA)' : 'View SLA Contract'}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* 4 Big Operational Metric Cards */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+                <div className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl p-4">
+                  <span className="text-[11px] text-cyan-200 block font-medium">{isEthiopic ? 'የቀን የውሃ ስርጭት' : 'Daily Potable Flow'}</span>
+                  <span className="text-2xl font-black text-white font-mono-numbers block mt-1">520,000 ሜ³</span>
+                  <span className="text-[10px] text-emerald-300 font-semibold">{isEthiopic ? 'ከዕቅድ 104% በላይ' : '+4% vs target'}</span>
+                </div>
+
+                <div className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl p-4">
+                  <span className="text-[11px] text-cyan-200 block font-medium">{isEthiopic ? 'አማካይ የመስመር ጫና' : 'Grid Pressure'}</span>
+                  <span className="text-2xl font-black text-white font-mono-numbers block mt-1">3.4 Bar</span>
+                  <span className="text-[10px] text-cyan-300 font-semibold">{isEthiopic ? 'መደበኛ እና የተረጋጋ' : 'Optimal operating level'}</span>
+                </div>
+
+                <div className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl p-4">
+                  <span className="text-[11px] text-cyan-200 block font-medium">{isEthiopic ? 'የተሰበሰበ ገቢ (ብር)' : 'Total Revenue'}</span>
+                  <span className="text-2xl font-black text-emerald-300 font-mono-numbers block mt-1">
+                    {(totalCollectedBills + totalContributions).toLocaleString()} ETB
+                  </span>
+                  <span className="text-[10px] text-emerald-300 font-semibold">{isEthiopic ? 'በቴሌብርና ሲቢኢ ብር' : '100% digitally verified'}</span>
+                </div>
+
+                <div className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl p-4">
+                  <span className="text-[11px] text-cyan-200 block font-medium">{isEthiopic ? 'የጥገና ምላሽ ምጣኔ' : 'Incident Resolution'}</span>
+                  <span className="text-2xl font-black text-white font-mono-numbers block mt-1">
+                    {Math.round((incidents.filter(i => i.status === 'resolved').length / (incidents.length || 1)) * 100)}%
+                  </span>
+                  <span className="text-[10px] text-amber-300 font-semibold">
+                    {incidents.filter(i => i.status !== 'resolved').length} {isEthiopic ? 'በሂደት ላይ ያሉ' : 'active tickets'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Grid Overview Across Cities & Real-time Incidents */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* City Distribution Status (7 Cols) */}
+            <div className="lg:col-span-7 bg-white rounded-3xl border border-slate-200 p-6 space-y-4 shadow-xs">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <Droplet className="w-4 h-4 text-cyan-700" />
+                  <span>{isEthiopic ? 'በከተሞችና በዞኖች የውሃ አቅርቦት ሁኔታ' : 'City-wide Distribution Grid Coverage'}</span>
+                </h3>
+                <span className="text-xs text-slate-500 font-semibold">
+                  {schedules.length} {isEthiopic ? 'ዞኖች' : 'Zones'}
+                </span>
+              </div>
+
+              <div className="space-y-3 font-mono-numbers">
+                {schedules.slice(0, 6).map(sch => (
+                  <div key={sch.id} className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-3">
+                    <div className="space-y-0.5">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-xs text-slate-900">{sch.subCityAm}</span>
+                        <span className="text-[11px] text-slate-500 font-normal">({sch.zoneNameAm})</span>
+                      </div>
+                      <span className="text-[11px] text-slate-400 block">{sch.kebeles.join(', ')}</span>
+                    </div>
+
+                    <div className="flex items-center gap-3 shrink-0">
+                      <div className="text-right">
+                        <span className="text-xs font-bold text-slate-800 block">{sch.pressureBar} Bar</span>
+                        <span className="text-[10px] text-slate-400">ማጠራቀሚያ: {sch.reservoirLevelPercent}%</span>
+                      </div>
+                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
+                        sch.status === 'active_flowing'
+                          ? 'bg-emerald-100 text-emerald-800'
+                          : sch.status === 'upcoming'
+                          ? 'bg-cyan-100 text-cyan-800'
+                          : 'bg-amber-100 text-amber-800'
+                      }`}>
+                        {sch.status === 'active_flowing'
+                          ? (isEthiopic ? 'እየፈሰሰ ነው' : 'Flowing')
+                          : sch.status === 'upcoming'
+                          ? (isEthiopic ? 'በመጠባበቅ ላይ' : 'Upcoming')
+                          : (isEthiopic ? 'በጥገና ላይ' : 'Maintenance')}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <button
+                onClick={() => setActiveAdminTab('schedules')}
+                className="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5"
+              >
+                <span>{isEthiopic ? 'ሁሉንም የስርጭት ሰሌዳዎች አስተዳድር' : 'Manage All Grid Schedules'}</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* Critical Incidents Triage (5 Cols) */}
+            <div className="lg:col-span-5 bg-white rounded-3xl border border-slate-200 p-6 space-y-4 shadow-xs flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 text-rose-600" />
+                    <span>{isEthiopic ? 'አስቸኳይ የብልሽት ጥሪዎች' : 'Urgent Incident Dispatch'}</span>
+                  </h3>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800">
+                    {incidents.filter(i => i.urgency === 'critical').length} {isEthiopic ? 'አፋጣኝ' : 'Critical'}
+                  </span>
+                </div>
+
+                <div className="mt-3 space-y-2.5">
+                  {incidents.slice(0, 3).map(inc => (
+                    <div key={inc.id} className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-mono font-bold text-slate-900">{inc.ticketNumber}</span>
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                          inc.urgency === 'critical' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800'
+                        }`}>
+                          {inc.urgency}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-700 font-medium line-clamp-2">{inc.description}</p>
+                      <div className="flex items-center justify-between text-xs text-slate-500 pt-1">
+                        <span>{inc.subCityAm}</span>
+                        <button
+                          onClick={() => {
+                            setAssigningIncident(inc);
+                            setActiveAdminTab('incidents');
+                          }}
+                          className="px-2.5 py-1 bg-cyan-700 hover:bg-cyan-800 text-white rounded-lg text-[11px] font-bold"
+                        >
+                          {isEthiopic ? 'ቴክኒሻን መድብ' : 'Dispatch Tech'}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <button
+                onClick={() => setActiveAdminTab('incidents')}
+                className="mt-4 w-full py-2 border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5"
+              >
+                <span>{isEthiopic ? 'ወደ ሙሉ የስምሪት ዝርዝር ሂድ' : 'Go to Incident Dispatch Queue'}</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* EXCEL MANAGEMENT CENTER TAB */}
+      {activeAdminTab === 'excel-center' && (
+        <ExcelManagementCenter
+          bills={bills}
+          incidents={incidents}
+          customers={customers}
+          schedules={schedules}
+          lang={lang}
+          onBillsImported={onBillsUpdated}
+          onCustomersImported={onCustomersImported}
+        />
+      )}
+
+      {/* INSTITUTIONAL CONTRACT & SLA AGREEMENT TAB */}
+      {activeAdminTab === 'contract' && (
+        <InstitutionalContractAgreementView lang={lang} />
+      )}
 
       {/* TAB 1: INCIDENT DISPATCH & VIDEO/PHOTO REVIEW */}
       {activeAdminTab === 'incidents' && (
