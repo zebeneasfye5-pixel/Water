@@ -83,9 +83,21 @@ export const REGIONS_DIRECTORY: RegionInfo[] = [
       { am: 'ጎንደር', en: 'Gondar', zones: ['አራዳ', 'ፋሲል', 'አዘዞ', 'ማራኪ ዩኒቨርሲቲ'] },
       { am: 'ደሴ', en: 'Dessie', zones: ['ፒያሳ', 'ሆቴሼ', 'ቦሩ', 'ሮቢት'] },
       { am: 'ደብረ ብርሃን', en: 'Debre Birhan', zones: ['ኢንዱስትሪ መንደር', 'ቀበሌ 07', 'ተበሴ'] },
-      { am: 'ኮምቦልቻ', en: 'Kombolcha', zones: ['አውሮፕላን ማረፊያ', 'ቀበሌ 03', 'ሚሊኒየም'] },
       { am: 'ደብረ ማርቆስ', en: 'Debre Markos', zones: ['ንጉሥ ተክለሃይማኖት አደባባይ', 'ቀበሌ 02', 'መንደር 5'] },
-      { am: 'ወልዲያ', en: 'Woldiya', zones: ['ቀበሌ 01', 'አዴት በር', 'ገረዶ'] }
+      { am: 'ወልዲያ', en: 'Woldiya', zones: ['ቀበሌ 01', 'አዴት በር', 'ገረዶ'] },
+      { am: 'ኮምቦልቻ', en: 'Kombolcha', zones: ['አውሮፕላን ማረፊያ', 'ቀበሌ 03', 'ሚሊኒየም'] },
+      { am: 'ደብረ ታቦር', en: 'Debre Tabor', zones: ['ቀበሌ 01', 'ተክለሃይማኖት', 'አይባ በር'] },
+      { am: 'ላሊበላ', en: 'Lalibela', zones: ['ቤተ ጊዮርጊስ', 'ቀበሌ 02', 'ሮሃ ማዕከል'] },
+      { am: 'እንጅባራ', en: 'Injibara', zones: ['አገው ዞን', 'ቀበሌ 03', 'ፈረስ ቤት በር'] },
+      { am: 'ቆቦ', en: 'Kobo', zones: ['ራያ ቆቦ', 'ቀበሌ 01', 'ወደ ቆቦ'] },
+      { am: 'ፍኖተ ሰላም', en: 'Finote Selam', zones: ['ቀበሌ 02', 'ዩኒቨርሲቲ በር', 'አደባባይ'] },
+      { am: 'መርአዊ', en: 'Merawi', zones: ['ቀበሌ 01', 'ጢስ አባይ በር'] },
+      { am: 'ሞጣ', en: 'Motta', zones: ['ቀበሌ 03', 'ሰዶማ ዞን'] },
+      { am: 'ዳባት', en: 'Dabat', zones: ['ሰሜን ተራሮች በር', 'ቀበሌ 02'] },
+      { am: 'ሰቆጣ', en: 'Sekota', zones: ['ዋግ ኸምራ', 'ቀበሌ 01'] },
+      { am: 'ባቲ', en: 'Bati', zones: ['ገበያ ዞን', 'ቀበሌ 02'] },
+      { am: 'ሸዋ ሮቢት', en: 'Shewa Robit', zones: ['ቀበሌ 04', 'አውራ ጎዳና'] },
+      { am: 'የገጠር ቀበሌ / የውሃ ቦኖ ቀጠና', en: 'Rural Scheme / Village Kebele', zones: ['የገጠር ማህበር', 'የጉድጓድ ውሃ ቦኖ', 'ምንጭ ጥበቃ'] }
     ],
     primaryUtility: {
       nameAm: 'የአማራ ክልል ውሃና ኢነርጂ ልማት ቢሮ',

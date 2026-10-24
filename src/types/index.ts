@@ -2,6 +2,14 @@ export type Language = 'am' | 'en' | 'om' | 'ti' | 'fr' | 'de' | 'zh';
 
 export type FlowStatus = 'active_flowing' | 'upcoming' | 'maintenance' | 'offline';
 
+export interface CommunityComment {
+  id: string;
+  author: string;
+  text: string;
+  date: string;
+  isStaff?: boolean;
+}
+
 export interface WaterSchedule {
   id: string;
   subCityAm: string;
@@ -21,6 +29,10 @@ export interface WaterSchedule {
   flowDaysEn: string;
   flowHoursAm: string;
   flowHoursEn: string;
+  likesCount?: number;
+  hasLiked?: boolean;
+  sharesCount?: number;
+  comments?: CommunityComment[];
 }
 
 export interface BillRecord {
@@ -104,6 +116,7 @@ export interface InnovationIdea {
   detailsEn: string;
   upvotes: number;
   hasUpvoted?: boolean;
+  sharesCount?: number;
   status: 'community_proposal' | 'utility_reviewed' | 'adopted_in_field';
   submittedAt: string;
   comments: {

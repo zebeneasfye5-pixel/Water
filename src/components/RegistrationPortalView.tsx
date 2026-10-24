@@ -48,7 +48,8 @@ export const RegistrationPortalView: React.FC<RegistrationPortalViewProps> = ({
   // Customer Registration State
   const [custCountry, setCustCountry] = useState<'Ethiopia' | 'International'>('Ethiopia');
   const [custRegionId, setCustRegionId] = useState<string>('addis_ababa');
-  const [custCity, setCustCity] = useState<string>('Bole');
+  const [custCity, setCustCity] = useState<string>('ቦሌ');
+  const [custAreaType, setCustAreaType] = useState<'urban' | 'rural'>('urban');
   const [custWoreda, setCustWoreda] = useState<string>('ወረዳ 03');
   const [custSubCity, setCustSubCity] = useState<string>('');
   const [custKebele, setCustKebele] = useState<string>('ቀበሌ 01');
@@ -106,9 +107,9 @@ export const RegistrationPortalView: React.FC<RegistrationPortalViewProps> = ({
   // Update default city when region changes
   useEffect(() => {
     if (selectedRegion && selectedRegion.majorCities.length > 0) {
-      setCustCity(selectedRegion.majorCities[0].en);
+      setCustCity(isEthiopic ? selectedRegion.majorCities[0].am : selectedRegion.majorCities[0].en);
     }
-  }, [custRegionId]);
+  }, [custRegionId, isEthiopic]);
 
   // Load directory on mount or tab switch
   useEffect(() => {
@@ -513,12 +514,59 @@ export const RegistrationPortalView: React.FC<RegistrationPortalViewProps> = ({
 
               {/* Geographic Hierarchy (Country & Region Selector) */}
               <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
-                <span className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
-                  <Globe className="w-4 h-4 text-cyan-600" />
-                  <span>{isEthiopic ? '1. የጂኦግራፊያዊ መገኛና ክልል መረጣ' : '1. Geographic Jurisdiction & Region'}</span>
-                </span>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
+                  <span className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                    <Globe className="w-4 h-4 text-cyan-600" />
+                    <span>{isEthiopic ? '1. የጂኦግራፊያዊ መገኛና ክልል መረጣ (ያለ ምንም ገደብ)' : '1. Geographic Location & Jurisdiction'}</span>
+                  </span>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {/* Area Type: Urban City vs Rural Scheme */}
+                  <div className="flex items-center gap-1.5 p-1 bg-white border border-slate-200 rounded-xl">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCustAreaType('urban');
+                        if (custCity.includes('የገጠር')) {
+                          setCustCity(isEthiopic ? selectedRegion.majorCities[0].am : selectedRegion.majorCities[0].en);
+                        }
+                      }}
+                      className={`px-3 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
+                        custAreaType === 'urban'
+                          ? 'bg-cyan-700 text-white shadow-xs'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      <span>🏙️</span>
+                      <span>{isEthiopic ? 'ከተማ (Urban)' : 'City / Urban'}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCustAreaType('rural');
+                        setCustCity(isEthiopic ? 'የገጠር ቀበሌ የውሃ ቦኖ' : 'Rural Water Scheme');
+                      }}
+                      className={`px-3 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
+                        custAreaType === 'rural'
+                          ? 'bg-emerald-700 text-white shadow-xs'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      <span>🌾</span>
+                      <span>{isEthiopic ? 'ገጠራማ ቦታ (Rural Scheme)' : 'Rural Scheme'}</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="p-2.5 bg-cyan-50/70 border border-cyan-200 rounded-xl text-xs text-cyan-950 flex items-center gap-2">
+                  <span className="text-base">📌</span>
+                  <span className="font-semibold">
+                    {isEthiopic
+                      ? 'ይህ ሲስተም ማንኛውንም የኢትዮጵያ ከተማ፣ ወረዳ ወይም ገጠራማ ቀበሌ ያለገደብ ይመዘግባል። ከታች ባለው ክፍት ሳጥን ውስጥ የትኛውንም ከተማ ወይም ገጠር በነጻነት ይፃፉ።'
+                      : 'This portal accepts ANY city, town, or rural village in Ethiopia and abroad without restriction. Type freely below.'}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">
                       {isEthiopic ? 'አገር (Country)' : 'Country'} *
@@ -557,22 +605,66 @@ export const RegistrationPortalView: React.FC<RegistrationPortalViewProps> = ({
                       ))}
                     </select>
                   </div>
+                </div>
 
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
-                      {isEthiopic ? 'ከተማ / ክፍለ ከተማ' : 'City / Sub-City'} *
+                {/* Free-text Unrestricted City / Rural Area Input with Datalist & Quick Chips */}
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-bold text-slate-700">
+                      {isEthiopic
+                        ? (custAreaType === 'rural' ? 'የገጠራማው አካባቢ / የቀበሌ መጠሪያ (Rural Area / Village)' : 'የከተማ / ክፍለ ከተማ መጠሪያ (City / Sub-City)')
+                        : 'City, Town, or Rural Village Name'} *
                     </label>
-                    <select
-                      value={custCity}
-                      onChange={(e) => setCustCity(e.target.value)}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs bg-white font-medium"
-                    >
-                      {selectedRegion.majorCities.map((c) => (
-                        <option key={c.en} value={c.en}>
-                          {isEthiopic ? c.am : c.en}
-                        </option>
-                      ))}
-                    </select>
+                    <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100/80 px-2.5 py-0.5 rounded-full border border-emerald-300">
+                      {isEthiopic ? '✓ ማንኛውንም ከተማ ወይም ገጠር ያለገደብ ይፃፉ' : '✓ Any City or Rural Village Allowed'}
+                    </span>
+                  </div>
+
+                  <input
+                    type="text"
+                    required
+                    list="cust-city-suggestions"
+                    value={custCity}
+                    onChange={(e) => setCustCity(e.target.value)}
+                    placeholder={
+                      isEthiopic
+                        ? 'ምሳሌ፡ ደብረ ማርቆስ፣ ላሊበላ፣ እንጅባራ፣ ወልዲያ፣ ወይም ማንኛውም የገጠር ቀበሌ...'
+                        : 'e.g. Debre Markos, Lalibela, Injibara, Woldiya, or any rural village...'
+                    }
+                    className="w-full px-3.5 py-2.5 border-2 border-cyan-600/60 rounded-xl text-xs bg-white font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-cyan-600 shadow-xs"
+                  />
+
+                  {/* Browser Native Auto-Complete Datalist */}
+                  <datalist id="cust-city-suggestions">
+                    {selectedRegion.majorCities.map((c) => (
+                      <option key={c.en} value={isEthiopic ? c.am : c.en} />
+                    ))}
+                  </datalist>
+
+                  {/* Quick Clickable Suggestions for Region */}
+                  <div className="pt-2">
+                    <span className="text-[11px] font-semibold text-slate-500 block mb-1">
+                      {isEthiopic ? 'በ1 ጠቅታ ለመሙላት ወይም ሌላ ከተማ/ገጠር በሳጥኑ ውስጥ በነፃነት ይፃፉ፦' : 'Click to autofill or type custom name above:'}
+                    </span>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {selectedRegion.majorCities.map((c) => {
+                        const val = isEthiopic ? c.am : c.en;
+                        return (
+                          <button
+                            key={c.en}
+                            type="button"
+                            onClick={() => setCustCity(val)}
+                            className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition ${
+                              custCity === val
+                                ? 'bg-cyan-700 text-white border-cyan-800 shadow-xs'
+                                : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-300'
+                            }`}
+                          >
+                            {val}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
 

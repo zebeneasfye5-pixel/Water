@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Lightbulb, ThumbsUp, MessageSquare, Plus, CheckCircle2, Filter, Award, Send, X, BookOpen } from 'lucide-react';
+import { Lightbulb, ThumbsUp, Heart, Share2, MessageSquare, Plus, CheckCircle2, Filter, Award, Send, X, BookOpen } from 'lucide-react';
 import { InnovationIdea, Language } from '../types';
 import { translations } from '../utils/translations';
+import { SocialShareModal } from './SocialShareModal';
 
 interface InnovationKnowledgeViewProps {
   ideas: InnovationIdea[];
@@ -25,6 +26,7 @@ export const InnovationKnowledgeView: React.FC<InnovationKnowledgeViewProps> = (
   const [activeCommentIdeaId, setActiveCommentIdeaId] = useState<string | null>(null);
   const [newCommentText, setNewCommentText] = useState('');
   const [newCommentAuthor, setNewCommentAuthor] = useState('');
+  const [shareItem, setShareItem] = useState<{ title: string; summary: string } | null>(null);
 
   // Form states
   const [title, setTitle] = useState('');
@@ -180,31 +182,54 @@ export const InnovationKnowledgeView: React.FC<InnovationKnowledgeViewProps> = (
                 )}
               </div>
 
-              {/* Action Toolbar */}
-              <div className="flex items-center justify-between pt-2">
-                <div className="flex items-center gap-3">
+              {/* Action Toolbar: Like, Comment, Share */}
+              <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  {/* 1. LIKE (ላይክ) */}
                   <button
                     onClick={() => onUpvoteIdea(idea.id)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition ${
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition active:scale-95 ${
                       idea.hasUpvoted
-                        ? 'bg-cyan-700 text-white'
-                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                        ? 'bg-rose-50 text-rose-600 border border-rose-200'
+                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
                     }`}
+                    title={isEthiopic ? 'ላይክ ያድርጉ' : 'Like idea'}
                   >
-                    <ThumbsUp className="w-3.5 h-3.5" />
-                    <span>{idea.upvotes} {t.upvoteBtn}</span>
+                    <Heart className={`w-3.5 h-3.5 ${idea.hasUpvoted ? 'fill-rose-500 text-rose-500' : 'text-slate-400'}`} />
+                    <span>{idea.upvotes} {isEthiopic ? 'ላይክ' : 'Likes'}</span>
                   </button>
 
+                  {/* 2. COMMENT (ኮሜንት) */}
                   <button
                     onClick={() => setActiveCommentIdeaId(isCommenting ? null : idea.id)}
-                    className="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 flex items-center gap-1.5 transition"
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition active:scale-95 ${
+                      isCommenting
+                        ? 'bg-cyan-700 text-white'
+                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
+                    }`}
+                    title={isEthiopic ? 'ኮሜንቶች' : 'Comments'}
                   >
                     <MessageSquare className="w-3.5 h-3.5" />
-                    <span>{idea.comments.length} {lang === 'am' ? 'አስተያየቶች' : 'Comments'}</span>
+                    <span>{idea.comments.length} {isEthiopic ? 'ኮሜንት' : 'Comments'}</span>
+                  </button>
+
+                  {/* 3. SHARE (ሼር) */}
+                  <button
+                    onClick={() => {
+                      setShareItem({
+                        title: `የውሃ ፈጠራ እና እውቀት፡ ${isEthiopic ? idea.titleAm : idea.titleEn}`,
+                        summary: isEthiopic ? idea.summaryAm : idea.summaryEn
+                      });
+                    }}
+                    className="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 flex items-center gap-1.5 transition active:scale-95"
+                    title={isEthiopic ? 'ለሌሎች አጋራ' : 'Share'}
+                  >
+                    <Share2 className="w-3.5 h-3.5 text-cyan-600" />
+                    <span>{isEthiopic ? 'ሼር' : 'Share'}</span>
                   </button>
                 </div>
 
-                <span className="text-[11px] text-slate-400 capitalize">
+                <span className="text-[11px] text-slate-400 capitalize hidden sm:inline">
                   {idea.category.replace('_', ' ')}
                 </span>
               </div>
@@ -394,6 +419,17 @@ export const InnovationKnowledgeView: React.FC<InnovationKnowledgeViewProps> = (
             </form>
           </div>
         </div>
+      )}
+
+      {/* Social Share Modal */}
+      {shareItem && (
+        <SocialShareModal
+          isOpen={!!shareItem}
+          onClose={() => setShareItem(null)}
+          title={shareItem.title}
+          summary={shareItem.summary}
+          lang={lang}
+        />
       )}
     </div>
   );

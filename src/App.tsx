@@ -246,6 +246,46 @@ export default function App() {
     );
   };
 
+  const handleLikeSchedule = (scheduleId: string) => {
+    setSchedules(prev =>
+      prev.map(s => {
+        if (s.id === scheduleId) {
+          const liked = s.hasLiked ?? false;
+          return {
+            ...s,
+            hasLiked: !liked,
+            likesCount: Math.max(0, (s.likesCount ?? 0) + (liked ? -1 : 1))
+          };
+        }
+        return s;
+      })
+    );
+  };
+
+  const handleCommentSchedule = (scheduleId: string, text: string, author: string) => {
+    setSchedules(prev =>
+      prev.map(s => {
+        if (s.id === scheduleId) {
+          const currentComments = s.comments || [];
+          return {
+            ...s,
+            comments: [
+              ...currentComments,
+              {
+                id: `sc-${Date.now()}`,
+                author: author.trim() || (lang === 'am' ? 'ነዋሪ' : 'Resident'),
+                text: text.trim(),
+                date: new Date().toISOString().split('T')[0],
+                isStaff: false
+              }
+            ]
+          };
+        }
+        return s;
+      })
+    );
+  };
+
   const handleAddComment = (ideaId: string, commentText: string, author: string) => {
     setIdeas(prev =>
       prev.map(idea => {
@@ -725,6 +765,8 @@ export default function App() {
             schedules={schedules}
             lang={lang}
             onSubscribePhone={handleSubscribePhone}
+            onLikeSchedule={handleLikeSchedule}
+            onCommentSchedule={handleCommentSchedule}
           />
         )}
 

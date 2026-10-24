@@ -429,20 +429,50 @@ export const IncidentReportingView: React.FC<IncidentReportingViewProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      {lang === 'am' ? 'ከተማ / ክፍለ ከተማ' : 'City / Sub-City'} *
-                    </label>
-                    <select
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-xs font-semibold text-slate-700">
+                        {lang === 'am' ? 'ከተማ / ገጠራማ አካባቢ' : 'City / Town / Rural Area'} *
+                      </label>
+                      <span className="text-[10px] text-cyan-800 font-semibold bg-cyan-100/60 px-1.5 py-0.2 rounded">
+                        {lang === 'am' ? 'ማንኛውንም ቦታ ይፃፉ' : 'Any location allowed'}
+                      </span>
+                    </div>
+                    <input
+                      type="text"
+                      required
+                      list="incident-cities-datalist"
                       value={subCity}
                       onChange={(e) => setSubCity(e.target.value)}
-                      className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-cyan-600"
-                    >
+                      placeholder={lang === 'am' ? 'ምሳሌ፡ ደብረ ማርቆስ፣ ላሊበላ፣ እንጅባራ፣ ወይም ገጠር...' : 'Type any city, town, or rural area...'}
+                      className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-cyan-600 shadow-2xs"
+                    />
+
+                    <datalist id="incident-cities-datalist">
                       {subCityOptions.map(sc => (
-                        <option key={sc.en} value={sc.am}>
-                          {lang === 'am' ? sc.am : sc.en}
-                        </option>
+                        <option key={sc.en} value={lang === 'am' ? sc.am : sc.en} />
                       ))}
-                    </select>
+                    </datalist>
+
+                    <div className="flex items-center gap-1 flex-wrap pt-1.5">
+                      <span className="text-[10px] text-slate-400">{lang === 'am' ? 'ፈጣን፦' : 'Quick:'}</span>
+                      {subCityOptions.slice(0, 6).map(sc => {
+                        const label = lang === 'am' ? sc.am : sc.en;
+                        return (
+                          <button
+                            key={sc.en}
+                            type="button"
+                            onClick={() => setSubCity(label)}
+                            className={`px-1.5 py-0.5 rounded text-[10px] font-medium border transition ${
+                              subCity === label
+                                ? 'bg-cyan-700 text-white border-cyan-800'
+                                : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
+                            }`}
+                          >
+                            {label}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
 
                   <div>

@@ -14,6 +14,13 @@ export const INITIAL_SCHEDULES: WaterSchedule[] = [
     pressureBar: 3.8,
     reservoirLevelPercent: 88,
     subscribersCount: 1420,
+    likesCount: 124,
+    hasLiked: false,
+    sharesCount: 38,
+    comments: [
+      { id: 'c-1', author: 'አበበ ተሾመ', text: 'እኛ ሰፈር ሩዋንዳ ውሃው በጥሩ ግፊት እየፈሰሰ ነው፤ እናመሰግናለን!', date: 'ዛሬ 10:30' },
+      { id: 'c-2', author: 'ትዕግስት በቀለ', text: 'የቦሌ መድሃኒአለም አካባቢ እስከ ስንት ሰዓት ይቆያል?', date: 'ዛሬ 11:15' }
+    ],
     noticeAm: 'ውሃው እስከ ዛሬ እኩለ ሌሊት ድረስ በመደበኛ ጫና ይፈሳል፤ ታንከሮቻችሁን ሙሉ!',
     noticeEn: 'Water is currently flowing at normal pressure until midnight. Please fill reservoirs.',
     flowDaysAm: 'ማክሰኞ፣ ሐሙስ እና ቅዳሜ',
@@ -34,6 +41,12 @@ export const INITIAL_SCHEDULES: WaterSchedule[] = [
     pressureBar: 2.1,
     reservoirLevelPercent: 74,
     subscribersCount: 2890,
+    likesCount: 89,
+    hasLiked: false,
+    sharesCount: 22,
+    comments: [
+      { id: 'c-3', author: 'ዳዊት ግርማ', text: 'ሲኤምሲ ሚካኤል አካባቢ በጉጉት እየጠበቅን ነው።', date: 'ዛሬ 09:00' }
+    ],
     noticeAm: 'የሚቀጥለው የውሃ ተራ ከ3 ሰዓታት በኋላ ይጀምራል፤ ቫልቮች መከፈታቸውን ያረጋግጡ።',
     noticeEn: 'Next water distribution starts in 3.5 hours. Ensure internal intake valves are open.',
     flowDaysAm: 'ረቡዕ እና እሁድ',
@@ -54,6 +67,12 @@ export const INITIAL_SCHEDULES: WaterSchedule[] = [
     pressureBar: 3.4,
     reservoirLevelPercent: 82,
     subscribersCount: 1950,
+    likesCount: 156,
+    hasLiked: false,
+    sharesCount: 45,
+    comments: [
+      { id: 'c-4', author: 'ሳራ ሙሉጌታ', text: 'ካዛንቺስ ኢሲኤ አካባቢ ግፊቱ በጣም ጥሩ ነው።', date: 'ዛሬ 08:20' }
+    ],
     noticeAm: 'በአሁኑ ሰዓት ሙሉ ጫና አለው። ፍሰቱ ከ6 ሰዓት በኋላ ይዘጋል።',
     noticeEn: 'Water is currently flowing with full pressure. Closes in 6 hours.',
     flowDaysAm: 'ሰኞ እና ሐሙስ',
