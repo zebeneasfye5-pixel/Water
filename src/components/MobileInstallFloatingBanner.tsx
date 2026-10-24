@@ -19,12 +19,12 @@ export const MobileInstallFloatingBanner: React.FC<MobileInstallFloatingBannerPr
   if (isInstalled || dismissed) return null;
 
   const handleQuickInstall = async () => {
-    if (isInstallable) {
-      const ok = await install();
-      if (!ok) {
+    try {
+      const res = await install();
+      if (res.outcome !== 'accepted') {
         onOpenModal();
       }
-    } else {
+    } catch (_) {
       onOpenModal();
     }
   };

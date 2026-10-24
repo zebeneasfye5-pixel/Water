@@ -72,6 +72,7 @@ export interface IncidentReport {
   reporterPhone: string;
   subCityAm: string;
   subCityEn: string;
+  woreda?: string;
   specificLocation: string;
   category: 'pipe_burst' | 'water_contamination' | 'low_pressure' | 'meter_breakdown' | 'illegal_connection' | 'sewer_overflow';
   urgency: 'critical' | 'high' | 'medium' | 'low';

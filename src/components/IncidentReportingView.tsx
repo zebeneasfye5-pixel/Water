@@ -45,6 +45,7 @@ export const IncidentReportingView: React.FC<IncidentReportingViewProps> = ({
   const selectedRegion = REGIONS_DIRECTORY.find(r => r.id === selectedRegionId) || REGIONS_DIRECTORY[0];
   const subCityOptions = selectedRegion.majorCities;
   const [subCity, setSubCity] = useState(subCityOptions[0]?.am || 'ቦሌ');
+  const [woreda, setWoreda] = useState('ወረዳ 03');
   const [specificLocation, setSpecificLocation] = useState('');
   const [category, setCategory] = useState<IncidentReport['category']>('pipe_burst');
   const [urgency, setUrgency] = useState<IncidentReport['urgency']>('critical');
@@ -183,14 +184,17 @@ export const IncidentReportingView: React.FC<IncidentReportingViewProps> = ({
 
     setIsSubmitting(true);
 
+    const chosenGps = gpsCoords || { latitude: 9.0105, longitude: 38.7612, accuracy: 15 };
+
     const reportPayload = {
       type: category,
-      title: `${category.replace('_', ' ')} በ${subCity}`,
+      title: `${category.replace('_', ' ')} በ${subCity} ${woreda}`,
       description,
       subCity,
-      kebele: 'ቀበሌ 01',
+      woreda,
+      kebele: woreda || 'ቀበሌ 01',
       specificLocation,
-      gpsCoordinates: gpsCoords || { latitude: 9.0105, longitude: 38.7612 },
+      gpsCoordinates: chosenGps,
       photos: attachedPhoto ? [attachedPhoto] : [],
       videos: attachedVideo ? [attachedVideo] : [],
       severity: urgency,
@@ -215,10 +219,12 @@ export const IncidentReportingView: React.FC<IncidentReportingViewProps> = ({
       reporterPhone,
       subCityAm: subCity,
       subCityEn: subCityOptions.find(o => o.am === subCity)?.en || subCity,
+      woreda,
       specificLocation,
       category,
       urgency,
       description,
+      gpsCoordinates: chosenGps,
       photoUrl: attachedPhoto,
       videoUrl: attachedVideo,
       audioVoiceUrl: attachedAudio
@@ -385,8 +391,20 @@ export const IncidentReportingView: React.FC<IncidentReportingViewProps> = ({
               </div>
 
               {/* Location details with Live High-Precision GPS */}
-              <div className="space-y-3">
-                <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+              <div className="space-y-4 bg-slate-50/80 p-4 sm:p-5 rounded-2xl border border-slate-200">
+                <div className="border-b border-slate-200 pb-2.5 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-rose-600" />
+                    <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                      {lang === 'am' ? 'የብልሽቱ ትክክለኛ አድራሻ እና የሳተላይት GPS ካርታ' : 'Incident Address & High-Resolution Satellite GPS'}
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-cyan-800 font-semibold bg-cyan-100/70 px-2 py-0.5 rounded-full">
+                    {lang === 'am' ? 'ለባለሞያዎች አቅጣጫ መጠቆሚያ' : 'For Dispatch Navigation'}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
                       {lang === 'am' ? 'ክልል / ዞን' : 'Region'} *
@@ -400,7 +418,7 @@ export const IncidentReportingView: React.FC<IncidentReportingViewProps> = ({
                           setSubCity(reg.majorCities[0].am);
                         }
                       }}
-                      className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-cyan-600 focus:bg-white"
+                      className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-cyan-600"
                     >
                       {REGIONS_DIRECTORY.map(r => (
                         <option key={r.id} value={r.id}>
@@ -417,7 +435,7 @@ export const IncidentReportingView: React.FC<IncidentReportingViewProps> = ({
                     <select
                       value={subCity}
                       onChange={(e) => setSubCity(e.target.value)}
-                      className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-cyan-600 focus:bg-white"
+                      className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-cyan-600"
                     >
                       {subCityOptions.map(sc => (
                         <option key={sc.en} value={sc.am}>
@@ -427,45 +445,59 @@ export const IncidentReportingView: React.FC<IncidentReportingViewProps> = ({
                     </select>
                   </div>
 
-                  <div className="sm:col-span-2">
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="block text-xs font-semibold text-slate-700">
-                        {t.exactLocationLabel} *
-                      </label>
-                      <button
-                        type="button"
-                        onClick={handleUseLocation}
-                        disabled={isGettingGps}
-                        className="text-[11px] text-cyan-700 hover:text-cyan-800 font-semibold flex items-center gap-1.5 px-2 py-0.5 rounded bg-cyan-50 border border-cyan-200 transition"
-                      >
-                        {isGettingGps ? (
-                          <RefreshCw className="w-3 h-3 animate-spin text-cyan-700" />
-                        ) : (
-                          <Crosshair className="w-3 h-3 text-cyan-700" />
-                        )}
-                        <span>{lang === 'am' ? 'የአሁኑን መገኛዬን (GPS) ጠቁም' : 'Capture Live GPS'}</span>
-                      </button>
-                    </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      {lang === 'am' ? 'ወረዳ / ቀበሌ' : 'Woreda / Kebele'} *
+                    </label>
                     <input
                       type="text"
                       required
-                      value={specificLocation}
-                      onChange={(e) => setSpecificLocation(e.target.value)}
-                      placeholder={t.locationPlaceholder}
-                      className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-600 focus:bg-white"
+                      value={woreda}
+                      onChange={(e) => setWoreda(e.target.value)}
+                      placeholder={lang === 'am' ? 'ምሳሌ፡ ወረዳ 03 ወይም ቀበሌ 01' : 'e.g., Woreda 03'}
+                      className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-cyan-600"
                     />
                   </div>
                 </div>
 
-                {/* GPS Coordinates & Interactive Satellite Map */}
-                <div className="space-y-2 pt-2">
-                  <div className="flex items-center justify-between text-xs px-1">
-                    <span className="font-semibold text-slate-800 flex items-center gap-1.5">
-                      <MapPin className="w-4 h-4 text-red-600" />
-                      <span>{lang === 'am' ? 'የብልሽቱ ትክክለኛ የሳተላይት ካርታ መገኛ (ምስል)' : 'Exact Satellite & Street Location'}</span>
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-semibold text-slate-700">
+                      {t.exactLocationLabel} (የመንገድ ወይም የሰፈር መጠሪያ) *
+                    </label>
+                    <button
+                      type="button"
+                      onClick={handleUseLocation}
+                      disabled={isGettingGps}
+                      className="text-[11px] text-cyan-800 hover:text-cyan-950 font-bold flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-cyan-100/80 hover:bg-cyan-200/80 border border-cyan-300 transition shadow-2xs"
+                    >
+                      {isGettingGps ? (
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin text-cyan-800" />
+                      ) : (
+                        <Crosshair className="w-3.5 h-3.5 text-cyan-800" />
+                      )}
+                      <span>{lang === 'am' ? 'የአሁኑን መገኛዬን (GPS) በራስ-ሰር ያግኙ' : 'Capture Live Phone GPS'}</span>
+                    </button>
+                  </div>
+                  <input
+                    type="text"
+                    required
+                    value={specificLocation}
+                    onChange={(e) => setSpecificLocation(e.target.value)}
+                    placeholder={t.locationPlaceholder}
+                    className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-600"
+                  />
+                </div>
+
+                {/* GPS Coordinates & Interactive Satellite Map with clear technician instruction */}
+                <div className="space-y-2 pt-1">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs px-1">
+                    <span className="font-bold text-slate-900 flex items-center gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping" />
+                      <span>{lang === 'am' ? 'የብልሽቱ ትክክለኛ የሳተላይት መገኛ ካርታ (ባለሞያዎች ቦታውን በምስል እንዲረዱት ካርታው ላይ ጠቁም)' : 'Exact Satellite Leak Map (Click/drag pin to pinpoint break)'}</span>
                     </span>
-                    <span className="text-[11px] font-mono text-slate-500">
-                      {gpsCoords ? `${gpsCoords.latitude.toFixed(5)}°N, ${gpsCoords.longitude.toFixed(5)}°E` : '9.0105°N, 38.7612°E'}
+                    <span className="text-[11px] font-mono text-cyan-900 font-bold bg-white px-2 py-0.5 rounded border border-slate-200">
+                      {gpsCoords ? `📍 ${gpsCoords.latitude.toFixed(5)}°N, ${gpsCoords.longitude.toFixed(5)}°E (±${gpsCoords.accuracy || 15}m)` : '📍 9.01050°N, 38.76120°E'}
                     </span>
                   </div>
 
@@ -473,22 +505,27 @@ export const IncidentReportingView: React.FC<IncidentReportingViewProps> = ({
                     latitude={gpsCoords?.latitude || 9.0105}
                     longitude={gpsCoords?.longitude || 38.7612}
                     accuracy={gpsCoords?.accuracy || 15}
-                    label={category ? `${category.replace('_', ' ')}` : (lang === 'am' ? 'የብልሽት ቦታ' : 'Leak Location')}
+                    label={category ? `${category.replace('_', ' ')} (${subCity} ${woreda})` : (lang === 'am' ? 'የብልሽት ቦታ' : 'Leak Location')}
                     isEditable={true}
                     variant="incident"
-                    height="280px"
+                    height="300px"
                     lang={lang}
                     onLocationChange={(coords) => {
                       setGpsCoords(coords);
                       if (!specificLocation || specificLocation.includes('ጂፒኤስ፡') || specificLocation.includes('GPS:')) {
                         setSpecificLocation(
                           lang === 'am'
-                            ? `ጂፒኤስ፡ ${coords.latitude}°N, ${coords.longitude}°E (±${coords.accuracy || 10}m)`
-                            : `GPS: ${coords.latitude}°N, ${coords.longitude}°E (±${coords.accuracy || 10}m)`
+                            ? `ጂፒኤስ፡ ${coords.latitude.toFixed(5)}°N, ${coords.longitude.toFixed(5)}°E (±${coords.accuracy || 10}m)`
+                            : `GPS: ${coords.latitude.toFixed(5)}°N, ${coords.longitude.toFixed(5)}°E (±${coords.accuracy || 10}m)`
                         );
                       }
                     }}
                   />
+                  <p className="text-[11px] text-slate-500 italic px-1">
+                    {lang === 'am'
+                      ? '💡 ካርታው ላይ ያለውን ቀይ ምልክት ጣትዎን በመጠቀም ብልሽቱ ወዳለበት ትክክለኛ ቤት ወይም የመንገድ ዳርቻ ያንቀሳቅሱ። ባለሞያዎች ይህንን ምስል በቀጥታ ያዩታል።'
+                      : '💡 Drag the red pin to the exact spot where the pipe or valve is leaking so technicians can navigate directly.'}
+                  </p>
                 </div>
               </div>
 
@@ -790,11 +827,22 @@ export const IncidentReportingView: React.FC<IncidentReportingViewProps> = ({
               </div>
 
               {/* Map of Incident Location */}
-              <div className="space-y-1.5">
-                <span className="text-xs font-bold text-slate-900 block flex items-center gap-1.5">
-                  <MapPin className="w-4 h-4 text-red-600" />
-                  <span>{lang === 'am' ? 'የብልሽቱ ትክክለኛ የሳተላይት መገኛ ካርታ' : 'Geographic Satellite Location'}</span>
-                </span>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                    <MapPin className="w-4 h-4 text-red-600" />
+                    <span>{lang === 'am' ? 'የብልሽቱ ትክክለኛ የሳተላይት መገኛ ካርታ' : 'Geographic Satellite Location'}</span>
+                  </span>
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${searchedIncident.gpsCoordinates?.latitude || 9.0105},${searchedIncident.gpsCoordinates?.longitude || 38.7612}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-cyan-700 hover:bg-cyan-800 text-white rounded-lg text-[11px] font-bold shadow-xs transition"
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                    <span>{lang === 'am' ? 'ባለሞያ በGoogle Maps አቅጣጫ እንዲያይ' : 'Open in Google Maps'}</span>
+                  </a>
+                </div>
                 <InteractiveGpsMap
                   latitude={searchedIncident.gpsCoordinates?.latitude || 9.0105}
                   longitude={searchedIncident.gpsCoordinates?.longitude || 38.7612}
@@ -802,7 +850,7 @@ export const IncidentReportingView: React.FC<IncidentReportingViewProps> = ({
                   label={`${searchedIncident.ticketNumber} - ${searchedIncident.subCityAm}`}
                   isEditable={false}
                   variant="incident"
-                  height="240px"
+                  height="260px"
                   lang={lang}
                 />
               </div>

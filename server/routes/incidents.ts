@@ -72,7 +72,9 @@ incidentsRouter.post('/', (req: Request, res: Response) => {
       category,
       description,
       subCity,
+      woreda,
       specificLocation,
+      gpsCoordinates,
       photos,
       videos,
       severity,
@@ -96,10 +98,12 @@ incidentsRouter.post('/', (req: Request, res: Response) => {
       reporterPhone: reporterPhone || '0900000000',
       subCityAm: subCity || 'ቦሌ',
       subCityEn: subCity || 'Bole',
+      woreda: woreda || 'ወረዳ 01',
       specificLocation: specificLocation || '',
       category: chosenCategory,
       urgency: chosenUrgency,
       description,
+      gpsCoordinates: gpsCoordinates || { latitude: 9.0105, longitude: 38.7612 },
       photoUrl: Array.isArray(photos) && photos.length > 0 ? photos[0] : (typeof photos === 'string' ? photos : undefined),
       videoUrl: Array.isArray(videos) && videos.length > 0 ? videos[0] : (typeof videos === 'string' ? videos : undefined)
     });

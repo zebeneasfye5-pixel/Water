@@ -22,7 +22,8 @@ import {
   Check,
   Smartphone,
   ExternalLink,
-  DollarSign
+  DollarSign,
+  MapPin
 } from 'lucide-react';
 import { IncidentReport, WaterSchedule, BillRecord, ContributionProject, EmergencyNotice, Language } from '../types';
 import { translations } from '../utils/translations';
@@ -486,6 +487,14 @@ MTR-55102,ዳዊት ወልደሚካኤል,አራዳ,ቀበሌ 01,0933112233,610,
                             <ExternalLink className="w-3.5 h-3.5" />
                           </button>
                         )}
+                        <button
+                          onClick={() => setInspectingIncident(inc)}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-cyan-50 hover:bg-cyan-100 text-cyan-800 text-[10px] font-bold border border-cyan-200 transition"
+                          title="Open GPS Satellite Map"
+                        >
+                          <MapPin className="w-3 h-3 text-red-500" />
+                          <span>{lang === 'am' ? 'ካርታ/GPS' : 'Map/GPS'}</span>
+                        </button>
                       </div>
                     </td>
                     <td className="py-3.5 px-4">
@@ -1112,10 +1121,21 @@ MTR-55102,ዳዊት ወልደሚካኤል,አራዳ,ቀበሌ 01,0933112233,610,
               )}
 
               {/* Geotagged Satellite Location */}
-              <div className="space-y-1">
-                <span className="text-xs font-bold text-slate-800 block">
-                  {lang === 'am' ? 'የብልሽቱ ትክክለኛ የሳተላይት መገኛ ካርታ' : 'Satellite Location Map'}:
-                </span>
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-800 block">
+                    {lang === 'am' ? 'የብልሽቱ ትክክለኛ የሳተላይት መገኛ ካርታ' : 'Satellite Location Map'}:
+                  </span>
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${inspectingIncident.gpsCoordinates?.latitude || 9.0105},${inspectingIncident.gpsCoordinates?.longitude || 38.7612}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-cyan-700 hover:bg-cyan-800 text-white rounded-lg text-[11px] font-bold shadow-xs transition"
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                    <span>{lang === 'am' ? 'ባለሞያ በGoogle Maps አቅጣጫ እንዲያይ' : 'Navigate in Google Maps'}</span>
+                  </a>
+                </div>
                 <InteractiveGpsMap
                   latitude={inspectingIncident.gpsCoordinates?.latitude || 9.0105}
                   longitude={inspectingIncident.gpsCoordinates?.longitude || 38.7612}
@@ -1123,7 +1143,7 @@ MTR-55102,ዳዊት ወልደሚካኤል,አራዳ,ቀበሌ 01,0933112233,610,
                   label={`${inspectingIncident.ticketNumber} - ${inspectingIncident.subCityAm}`}
                   isEditable={false}
                   variant="incident"
-                  height="220px"
+                  height="240px"
                   lang={lang}
                 />
               </div>
