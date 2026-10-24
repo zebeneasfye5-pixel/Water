@@ -24,7 +24,8 @@ import {
   Smartphone,
   Download,
   UserPlus,
-  LayoutDashboard
+  LayoutDashboard,
+  Menu
 } from 'lucide-react';
 import {
   Language,
@@ -56,6 +57,7 @@ import { MobileInstallFloatingBanner } from './components/MobileInstallFloatingB
 import { RegistrationPortalView } from './components/RegistrationPortalView';
 import { CitizenDashboardView } from './components/CitizenDashboardView';
 import { InstitutionalContractAgreementView } from './components/InstitutionalContractAgreementView';
+import { DashboardDrawer } from './components/DashboardDrawer';
 import { CustomerRecord } from './types';
 
 // Hero image generated asset
@@ -79,6 +81,7 @@ export default function App() {
     return (saved as Language) || 'am';
   });
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [activeNav, setActiveNav] = useState<'schedule' | 'citizen-dashboard' | 'payments' | 'incident' | 'knowledge' | 'staff' | 'register' | 'contract'>('schedule');
   const [isTankerModalOpen, setIsTankerModalOpen] = useState(false);
   const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
@@ -523,128 +526,76 @@ export default function App() {
         </aside>
       )}
 
-      {/* 2. TOP BAR CONTRACT */}
+      {/* 2. TOP BAR - CLEAN, MODERN & PACKED IN 3-LINE (☰) HAMBURGER DRAWER */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-8">
-          {/* Zone 1: Single text element wordmark */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+          {/* Left: Brand Logo & Title */}
           <button
-            onClick={() => setActiveNav('schedule')}
-            className="flex items-center gap-2 text-slate-900 hover:text-cyan-800 transition text-left whitespace-nowrap shrink-0 group"
+            onClick={() => setActiveNav('citizen-dashboard')}
+            className="flex items-center gap-2.5 text-slate-900 hover:text-cyan-800 transition text-left whitespace-nowrap shrink-0 group"
           >
-            <div className="w-9 h-9 rounded-xl bg-cyan-700 text-white flex items-center justify-center shadow-xs">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-cyan-800 to-cyan-600 text-white flex items-center justify-center shadow-xs group-hover:scale-102 transition">
               <Droplets className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-base font-extrabold tracking-tight block leading-tight">
+              <span className="text-base font-black tracking-tight block leading-tight text-slate-900">
                 {lang === 'am' ? 'የውሃና ፍሳሽ ዲጂታል ፖርታል' : 'AquaFlow Water Utility'}
               </span>
-              <span className="text-[10px] text-slate-500 block">
-                {lang === 'am' ? 'የከተማው ይፋዊ አገልግሎት' : 'Official Municipal Bureau'}
+              <span className="text-[10px] text-slate-500 font-medium block">
+                {lang === 'am' ? 'የከተማና የገጠር ይፋዊ አገልግሎት' : 'Official Public Bureau'}
               </span>
             </div>
           </button>
 
-          {/* Zone 2: Concise Nav Links */}
-          <nav className="hidden lg:flex items-center gap-5 text-xs font-semibold text-slate-600">
-            <button
-              onClick={() => setActiveNav('schedule')}
-              className={`hover:text-slate-900 transition-colors whitespace-nowrap shrink-0 py-1 ${
-                activeNav === 'schedule' ? 'text-cyan-800 border-b-2 border-cyan-700' : ''
-              }`}
-            >
-              {t.navSchedule}
-            </button>
-            <button
-              onClick={() => setActiveNav('citizen-dashboard')}
-              className={`hover:text-slate-900 transition-colors whitespace-nowrap shrink-0 py-1 flex items-center gap-1.5 font-bold ${
-                activeNav === 'citizen-dashboard' ? 'text-cyan-800 border-b-2 border-cyan-700' : 'text-slate-700'
-              }`}
-            >
-              <LayoutDashboard className="w-3.5 h-3.5 text-cyan-600" />
-              <span>{lang === 'am' ? 'የተጠቃሚ ዳሽቦርድ' : 'My Dashboard'}</span>
-            </button>
-            <button
-              onClick={() => setActiveNav('payments')}
-              className={`hover:text-slate-900 transition-colors whitespace-nowrap shrink-0 py-1 ${
-                activeNav === 'payments' ? 'text-cyan-800 border-b-2 border-cyan-700' : ''
-              }`}
-            >
-              {t.navPayments}
-            </button>
-            <button
-              onClick={() => setActiveNav('incident')}
-              className={`hover:text-slate-900 transition-colors whitespace-nowrap shrink-0 py-1 flex items-center gap-1.5 ${
-                activeNav === 'incident' ? 'text-cyan-800 border-b-2 border-cyan-700' : ''
-              }`}
-            >
-              <AlertCircle className="w-3.5 h-3.5 text-cyan-600" />
-              <span>{t.navReportIncident}</span>
-            </button>
-            <button
-              onClick={() => setActiveNav('register')}
-              className={`hover:text-slate-900 transition-colors whitespace-nowrap shrink-0 py-1 flex items-center gap-1.5 ${
-                activeNav === 'register' ? 'text-cyan-800 border-b-2 border-cyan-700 font-bold' : ''
-              }`}
-            >
-              <UserPlus className="w-3.5 h-3.5 text-cyan-600" />
-              <span>{lang === 'am' ? 'ይመዝገቡ' : lang === 'om' ? 'Galmaa\'aa' : lang === 'ti' ? 'ተመዝገቡ' : 'Register'}</span>
-            </button>
-            <button
-              onClick={() => setActiveNav('knowledge')}
-              className={`hover:text-slate-900 transition-colors whitespace-nowrap shrink-0 py-1 ${
-                activeNav === 'knowledge' ? 'text-cyan-800 border-b-2 border-cyan-700' : ''
-              }`}
-            >
-              {t.navKnowledge}
-            </button>
-            <button
-              onClick={() => setActiveNav('staff')}
-              className={`hover:text-slate-900 transition-colors whitespace-nowrap shrink-0 py-1 flex items-center gap-1.5 ${
-                activeNav === 'staff' ? 'text-slate-900 font-bold border-b-2 border-slate-900' : 'text-slate-600'
-              }`}
-            >
-              <Shield className="w-3.5 h-3.5" />
-              <span>{t.navStaffPortal}</span>
-            </button>
-            <button
-              onClick={() => setActiveNav('contract')}
-              className={`hover:text-slate-900 transition-colors whitespace-nowrap shrink-0 py-1 flex items-center gap-1.5 text-purple-800 ${
-                activeNav === 'contract' ? 'font-bold border-b-2 border-purple-700' : ''
-              }`}
-            >
-              <FileCheck2 className="w-3.5 h-3.5 text-purple-600" />
-              <span>{lang === 'am' ? 'የአስተዳደር ውል' : 'SLA Contract'}</span>
-            </button>
-          </nav>
+          {/* Center: Current Active View Indicator Badge */}
+          <div className="hidden md:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100/90 border border-slate-200/80 text-xs font-bold text-slate-800 shadow-2xs">
+            <span className="w-2 h-2 rounded-full bg-cyan-600 animate-pulse" />
+            <span>
+              {activeNav === 'citizen-dashboard'
+                ? (lang === 'am' ? '📊 የተጠቃሚ ዳሽቦርድ' : '📊 My Dashboard')
+                : activeNav === 'schedule'
+                ? (lang === 'am' ? '💧 የውሃ ስርጭት መርሃግብር' : '💧 Water Distribution Schedule')
+                : activeNav === 'payments'
+                ? (lang === 'am' ? '💳 የክፍያና ደረሰኝ ማዕከል' : '💳 Payments & Bills')
+                : activeNav === 'incident'
+                ? (lang === 'am' ? '🚨 የብልሽት አቤቱታ በፎቶና ጂፒኤስ' : '🚨 Incident Reporting')
+                : activeNav === 'register'
+                ? (lang === 'am' ? '📝 የደንበኛና ቆጣሪ ምዝገባ' : '📝 New Customer Registration')
+                : activeNav === 'staff'
+                ? (lang === 'am' ? '🛡️ የተቋም አስተዳደርና ኮንትሮል ሩም' : '🛡️ Utility Control Room')
+                : activeNav === 'contract'
+                ? (lang === 'am' ? '📜 የሶፍትዌር ግንባታና የአገልግሎት ውል (SLA)' : '📜 Handover & SLA Contract')
+                : (lang === 'am' ? '💡 የፈጠራና እውቀት መጋሪያ' : '💡 Innovation Hub')}
+            </span>
+          </div>
 
-          {/* Zone 3: 1 Primary Action & Utilities */}
-          <div className="flex items-center gap-3 shrink-0">
-            {/* Language Dropdown Selector (7 Languages) */}
+          {/* Right: Language Selector + The 3-Line (☰) Hamburger Menu Button */}
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            {/* Quick Language Dropdown Selector */}
             <div className="relative">
               <button
                 onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
-                className="px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-800 hover:bg-slate-50 flex items-center gap-1.5 whitespace-nowrap shrink-0 shadow-2xs"
+                className="px-2.5 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-semibold text-slate-800 flex items-center gap-1.5 whitespace-nowrap shadow-2xs transition"
                 title="Select Language / ቋንቋ ምረጥ"
               >
                 <span className="text-sm">
                   {SUPPORTED_LANGUAGES.find(l => l.code === lang)?.flag || '🌐'}
                 </span>
-                <span className="font-medium">
+                <span className="hidden sm:inline font-medium text-xs">
                   {SUPPORTED_LANGUAGES.find(l => l.code === lang)?.nativeName || 'አማርኛ'}
                 </span>
                 <span className="text-[10px] text-slate-400">▾</span>
               </button>
 
-              {/* Dropdown Menu */}
               {isLangMenuOpen && (
                 <>
                   <div
                     className="fixed inset-0 z-40"
                     onClick={() => setIsLangMenuOpen(false)}
                   />
-                  <div className="absolute right-0 mt-1.5 w-48 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-50 animate-in fade-in zoom-in-95 duration-100">
+                  <div className="absolute right-0 mt-1.5 w-44 bg-white rounded-2xl shadow-xl border border-slate-200 py-1.5 z-50 animate-in fade-in zoom-in-95 duration-100">
                     <div className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 mb-1">
-                      {lang === 'am' ? 'ቋንቋ ይምረጡ' : lang === 'om' ? 'Afaan Filadhu' : lang === 'ti' ? 'ቋንቋ ምረጹ' : 'Choose Language'}
+                      {lang === 'am' ? 'ቋንቋ ይምረጡ' : 'Choose Language'}
                     </div>
                     {SUPPORTED_LANGUAGES.map((l) => (
                       <button
@@ -673,240 +624,45 @@ export default function App() {
               )}
             </div>
 
-            {/* Mobile App Download & Install Button */}
+            {/* THE PROMINENT 3-LINE (☰) HAMBURGER MENU / DASHBOARD BUTTON */}
             <button
-              onClick={() => setIsInstallModalOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-cyan-700 to-cyan-800 hover:from-cyan-800 hover:to-cyan-900 text-white rounded-lg text-xs font-bold transition shadow-xs whitespace-nowrap shrink-0"
-              title="አፕሊኬሽኑን በስልክዎ ላይ ጫን / Install Mobile App"
+              onClick={() => setIsDrawerOpen(true)}
+              className="flex items-center gap-2 px-3.5 sm:px-4 py-2 bg-gradient-to-r from-cyan-700 via-cyan-800 to-slate-900 hover:from-cyan-800 hover:to-black text-white rounded-xl text-xs font-black shadow-md hover:shadow-lg transition active:scale-95 group border border-cyan-600/30"
+              title={lang === 'am' ? 'የተሟላ ዳሽቦርድ እና ዝርዝር መረጃዎች (☰)' : 'Open All Dashboards & Menu (☰)'}
             >
-              <Smartphone className="w-3.5 h-3.5 text-cyan-200" />
-              <span>{lang === 'am' ? 'አፕ በስልክ ጫን' : lang === 'om' ? 'App Moobaayila' : lang === 'ti' ? 'ኣፕ ጽዓን' : 'Install App'}</span>
-            </button>
-
-            {/* Tanker Request Button */}
-            <button
-              onClick={() => setIsTankerModalOpen(true)}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-semibold transition whitespace-nowrap shrink-0"
-            >
-              <Truck className="w-3.5 h-3.5 text-cyan-700" />
-              <span>{t.navTanker}</span>
-            </button>
-
-            {/* Primary Action Button (Report Issue in Photo/Video) */}
-            <button
-              onClick={() => setActiveNav('incident')}
-              className="px-4 py-2 text-xs font-bold text-white bg-slate-900 rounded-lg hover:bg-slate-800 shadow-sm transition-colors whitespace-nowrap shrink-0 flex items-center gap-1.5"
-            >
-              <AlertCircle className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">{t.reportIssueBtn}</span>
-              <span className="sm:hidden">{lang === 'am' ? 'አቤቱታ' : 'Report'}</span>
+              <Menu className="w-4 h-4 stroke-[2.5] text-cyan-200 group-hover:text-white transition" />
+              <span className="font-bold tracking-tight">
+                {lang === 'am' ? 'ዳሽቦርድ (☰)' : 'Menu (☰)'}
+              </span>
             </button>
           </div>
         </div>
-
-        {/* Mobile secondary navigation strip */}
-        <div className="lg:hidden flex items-center gap-1 overflow-x-auto px-4 py-2 border-t border-slate-100 text-xs bg-slate-50">
-          <button
-            onClick={() => setActiveNav('schedule')}
-            className={`px-3 py-1.5 rounded-md font-medium whitespace-nowrap shrink-0 ${
-              activeNav === 'schedule' ? 'bg-cyan-700 text-white' : 'text-slate-600'
-            }`}
-          >
-            {t.navSchedule}
-          </button>
-          <button
-            onClick={() => setActiveNav('citizen-dashboard')}
-            className={`px-3 py-1.5 rounded-md font-bold whitespace-nowrap shrink-0 ${
-              activeNav === 'citizen-dashboard' ? 'bg-cyan-700 text-white' : 'text-slate-700 bg-white border border-slate-200'
-            }`}
-          >
-            {lang === 'am' ? 'የተጠቃሚ ዳሽቦርድ' : 'My Dashboard'}
-          </button>
-          <button
-            onClick={() => setActiveNav('payments')}
-            className={`px-3 py-1.5 rounded-md font-medium whitespace-nowrap shrink-0 ${
-              activeNav === 'payments' ? 'bg-cyan-700 text-white' : 'text-slate-600'
-            }`}
-          >
-            {t.navPayments}
-          </button>
-          <button
-            onClick={() => setActiveNav('incident')}
-            className={`px-3 py-1.5 rounded-md font-medium whitespace-nowrap shrink-0 ${
-              activeNav === 'incident' ? 'bg-cyan-700 text-white' : 'text-slate-600'
-            }`}
-          >
-            {t.navReportIncident}
-          </button>
-          <button
-            onClick={() => setActiveNav('register')}
-            className={`px-3 py-1.5 rounded-md font-medium whitespace-nowrap shrink-0 flex items-center gap-1 ${
-              activeNav === 'register' ? 'bg-cyan-700 text-white font-bold' : 'text-cyan-800 bg-cyan-100/60'
-            }`}
-          >
-            <UserPlus className="w-3.5 h-3.5" />
-            <span>{lang === 'am' ? 'ይመዝገቡ' : 'Register'}</span>
-          </button>
-          <button
-            onClick={() => setActiveNav('staff')}
-            className={`px-3 py-1.5 rounded-md font-medium whitespace-nowrap shrink-0 ${
-              activeNav === 'staff' ? 'bg-slate-900 text-white' : 'text-slate-600'
-            }`}
-          >
-            {t.navStaffPortal}
-          </button>
-          <button
-            onClick={() => setActiveNav('contract')}
-            className={`px-3 py-1.5 rounded-md font-bold whitespace-nowrap shrink-0 ${
-              activeNav === 'contract' ? 'bg-purple-800 text-white' : 'text-purple-800 bg-purple-50'
-            }`}
-          >
-            {lang === 'am' ? 'ውል (SLA)' : 'Contract'}
-          </button>
-          <button
-            onClick={() => setActiveNav('knowledge')}
-            className={`px-3 py-1.5 rounded-md font-medium whitespace-nowrap shrink-0 ${
-              activeNav === 'knowledge' ? 'bg-cyan-700 text-white' : 'text-slate-600'
-            }`}
-          >
-            {t.navKnowledge}
-          </button>
-          <button
-            onClick={() => setActiveNav('staff')}
-            className={`px-3 py-1.5 rounded-md font-medium whitespace-nowrap shrink-0 ${
-              activeNav === 'staff' ? 'bg-slate-900 text-white' : 'text-slate-600'
-            }`}
-          >
-            {t.navStaffPortal}
-          </button>
-          <button
-            onClick={() => setIsTankerModalOpen(true)}
-            className="px-3 py-1.5 rounded-md font-medium text-cyan-800 bg-cyan-100/60 whitespace-nowrap shrink-0"
-          >
-            {t.navTanker}
-          </button>
-          <button
-            onClick={() => setIsInstallModalOpen(true)}
-            className="px-3 py-1.5 rounded-md font-bold text-white bg-gradient-to-r from-cyan-700 to-cyan-800 whitespace-nowrap shrink-0 flex items-center gap-1 shadow-xs"
-          >
-            <Smartphone className="w-3.5 h-3.5 text-cyan-200" />
-            <span>{lang === 'am' ? 'አፕ ጫን' : 'Install App'}</span>
-          </button>
-        </div>
       </header>
 
-      {/* 3. HERO SHOWCASE SECTION (Only show on citizen views when in schedule tab) */}
+      {/* 3. COMPACT CONTEXT BANNER (Sleek and minimal) */}
       {activeNav === 'schedule' && (
-        <section className="bg-white border-b border-slate-200 relative overflow-hidden">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-16 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            {/* Left Column 7 cols */}
-            <div className="lg:col-span-7 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-50 border border-cyan-200/60 text-xs font-semibold text-cyan-900">
-                <span className="w-2 h-2 rounded-full bg-cyan-600" />
-                <span>{t.heroBadge}</span>
-              </div>
-
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight" style={{ textWrap: 'balance' }}>
-                {t.heroTitle}
-              </h1>
-
-              <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-xl">
-                {t.heroSubtitle}
-              </p>
-
-              {/* Action Buttons */}
-              <div className="flex flex-wrap items-center gap-3 pt-2">
-                <button
-                  onClick={() => {
-                    const el = document.getElementById('main-content-anchor');
-                    el?.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                  className="px-6 py-3 bg-cyan-700 text-white rounded-xl text-xs font-bold hover:bg-cyan-800 transition shadow-sm flex items-center gap-2"
-                >
-                  <Droplets className="w-4 h-4" />
-                  <span>{t.checkScheduleBtn}</span>
-                </button>
-                <button
-                  onClick={() => setActiveNav('incident')}
-                  className="px-6 py-3 bg-white border border-slate-300 text-slate-800 rounded-xl text-xs font-bold hover:bg-slate-50 transition shadow-2xs flex items-center gap-2"
-                >
-                  <AlertCircle className="w-4 h-4 text-cyan-700" />
-                  <span>{t.reportIssueBtn}</span>
-                </button>
-                <button
-                  onClick={() => setActiveNav('register')}
-                  className="px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-2"
-                >
-                  <UserPlus className="w-4 h-4 text-emerald-200" />
-                  <span>{lang === 'am' ? 'አዲስ ቆጣሪ መዝግብ' : lang === 'om' ? 'Koodii Lakkooftuu Galmeessi' : lang === 'ti' ? 'ሓዲሽ ቆጻሪ መዝግብ' : 'Register Water Meter'}</span>
-                </button>
-                <button
-                  onClick={() => setActiveNav('payments')}
-                  className="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition"
-                >
-                  {t.payBillBtn}
-                </button>
-                <button
-                  onClick={() => setIsInstallModalOpen(true)}
-                  className="px-5 py-3 bg-cyan-50 border border-cyan-200 text-cyan-800 hover:bg-cyan-100 rounded-xl text-xs font-bold transition flex items-center gap-2"
-                >
-                  <Smartphone className="w-4 h-4 text-cyan-700" />
-                  <span>{lang === 'am' ? 'አፑን በስልክ ጫን (PWA)' : lang === 'om' ? 'App Moobaayila Fe\'i' : lang === 'ti' ? 'ኣፕ ኣብ ሞባይል ጽዓን' : 'Install App'}</span>
-                </button>
-              </div>
-
-              {/* Quick Trust / Adjacency Points */}
-              <div className="pt-4 border-t border-slate-100 grid grid-cols-3 gap-4 text-xs text-slate-600">
-                <div>
-                  <span className="font-extrabold text-slate-900 text-base font-mono-numbers block">24/7</span>
-                  <span className="text-[11px] text-slate-500">{lang === 'am' ? 'የአደጋ ጊዜ ምላሽ' : 'Rapid Response'}</span>
-                </div>
-                <div>
-                  <span className="font-extrabold text-slate-900 text-base font-mono-numbers block">100%</span>
-                  <span className="text-[11px] text-slate-500">{lang === 'am' ? 'ዲጂታል የክፍያ ደረሰኝ' : 'Instant Receipts'}</span>
-                </div>
-                <div>
-                  <span className="font-extrabold text-slate-900 text-base font-mono-numbers block">10+</span>
-                  <span className="text-[11px] text-slate-500">{lang === 'am' ? 'ክፍለ ከተሞች በሲስተም' : 'Connected Subcities'}</span>
-                </div>
+        <section className="bg-gradient-to-r from-cyan-900 via-slate-900 to-cyan-950 text-white py-4 px-4 sm:px-6 lg:px-8 border-b border-cyan-800/40">
+          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+              <div>
+                <span className="font-extrabold text-white text-sm block">
+                  {lang === 'am' ? 'የከተማና የገጠር የውሃ ስርጭት መርሃግብር' : 'Municipal Water Distribution Grid'}
+                </span>
+                <span className="text-[11px] text-cyan-200/80">
+                  {lang === 'am' ? 'በቀን ከ500,000 ሜ³ በላይ ንጹህ ውሃ ስርጭት · WHO ደረጃ የተረጋገጠ (99.4%)' : 'Over 500,000 m³ daily potable transmission · WHO standard 99.4%'}
+                </span>
               </div>
             </div>
 
-            {/* Right Column 5 cols - Real High Fidelity Generated Utility Imagery */}
-            <div className="lg:col-span-5 relative">
-              <div className="rounded-2xl overflow-hidden shadow-xl border border-slate-200 bg-slate-900 aspect-16/10 sm:aspect-4/3 relative group">
-                <img
-                  src={heroImage}
-                  alt="Modern Municipal Water Treatment Facility"
-                  className="w-full h-full object-cover group-hover:scale-102 transition duration-500"
-                  referrerPolicy="no-referrer"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end p-5">
-                  <div className="text-white">
-                    <span className="text-[11px] font-semibold uppercase tracking-wider text-cyan-300 block">
-                      {lang === 'am' ? 'የውሃ ማጣሪያ እና ማከፋፈያ ማዕከል' : 'Central Water Distribution Plant'}
-                    </span>
-                    <p className="text-xs text-white/90 font-medium mt-0.5">
-                      {lang === 'am' ? 'በቀን ከ500,000 ሜትር ኪዩብ በላይ ንጹህ የመጠጥ ውሃ ስርጭት' : 'Over 500,000 m³ daily potable transmission'}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Floating Quick Card */}
-              <div className="hidden sm:flex absolute -bottom-5 -left-5 bg-white p-3.5 rounded-xl border border-slate-200 shadow-lg items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
-                  <CheckCircle2 className="w-5 h-5" />
-                </div>
-                <div>
-                  <span className="text-xs font-bold text-slate-900 block leading-tight">
-                    {lang === 'am' ? 'የውሃ ጥራት ደረጃ: 99.4%' : 'Potability Index: 99.4%'}
-                  </span>
-                  <span className="text-[11px] text-slate-500">
-                    {lang === 'am' ? 'በላቦራቶሪ የተረጋገጠ' : 'WHO Standard Certified'}
-                  </span>
-                </div>
-              </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setIsDrawerOpen(true)}
+                className="px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-xs font-bold transition flex items-center gap-1.5 text-cyan-200"
+              >
+                <Menu className="w-3.5 h-3.5" />
+                <span>{lang === 'am' ? 'ሁሉንም አገልግሎቶች በዳሽቦርድ ክፈት' : 'Open All in Dashboard'}</span>
+              </button>
             </div>
           </div>
         </section>
@@ -1019,6 +775,19 @@ export default function App() {
           />
         )}
       </main>
+
+      {/* 4B. 3-LINE (☰) HAMBURGER DASHBOARD DRAWER */}
+      <DashboardDrawer
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        activeNav={activeNav}
+        onSelectNav={(nav) => setActiveNav(nav)}
+        lang={lang}
+        onOpenTankerModal={() => setIsTankerModalOpen(true)}
+        onOpenInstallModal={() => setIsInstallModalOpen(true)}
+        bills={bills}
+        schedules={schedules}
+      />
 
       {/* 5. TANKER REQUEST MODAL */}
       <TankerRequestModal
